@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material'
 
-function About() {
+const Upload = () => {
   return (
     <Box
       display="flex"
@@ -9,10 +9,10 @@ function About() {
       minHeight="calc(100vh - 64px)"
     >
       <Typography variant="h1" component="h1">
-        About
+        Subir aporte
       </Typography>
     </Box >
   )
 }
 
-export default About
+export default Upload

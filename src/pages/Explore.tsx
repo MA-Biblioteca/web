@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material'
 
-const Home = () => {
+const Explore = () => {
   return (
     <Box
       display="flex"
@@ -9,10 +9,10 @@ const Home = () => {
       minHeight="calc(100vh - 64px)"
     >
       <Typography variant="h1" component="h1">
-        Home
+        Explorar
       </Typography>
-    </Box>
+    </Box >
   )
 }
 
-export default Home
+export default Explore
