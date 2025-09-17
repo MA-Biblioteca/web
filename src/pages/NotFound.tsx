@@ -1,22 +1,19 @@
+import { notFoundPageBoxStyle } from '@/styles/global'
 import { Box, Typography, Button } from '@mui/material'
 import { Link } from 'react-router-dom'
 
 function NotFound() {
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="calc(100vh - 64px)"
-      gap={2}
-    >
+    <Box sx={notFoundPageBoxStyle}>
+
       <Typography variant="h1" component="h1" color="error">
         404
       </Typography>
+
       <Typography variant="h4" component="h2" gutterBottom>
         Página no encontrada
       </Typography>
+
       <Button
         component={Link}
         to="/"
@@ -25,6 +22,7 @@ function NotFound() {
       >
         Volver al inicio
       </Button>
+
     </Box>
   )
 }
