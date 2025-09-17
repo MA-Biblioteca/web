@@ -11,6 +11,7 @@ import Upload from './pages/Upload'
 import Moderation from './pages/Moderation'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
+import { ResourceProvider } from './contexts/ResourceContext'
 
 const theme = createTheme({
   palette: {
@@ -26,20 +27,22 @@ const theme = createTheme({
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="explore" element={<Explore />} />
-            <Route path="upload" element={<Upload />} />
-            <Route path="moderation" element={<Moderation />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </ThemeProvider>
-    </BrowserRouter>
+    <ResourceProvider>
+      <BrowserRouter>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="explore" element={<Explore />} />
+              <Route path="upload" element={<Upload />} />
+              <Route path="moderation" element={<Moderation />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </ThemeProvider>
+      </BrowserRouter>
+    </ResourceProvider>
   </React.StrictMode>,
 )
