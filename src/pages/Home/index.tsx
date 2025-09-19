@@ -7,7 +7,7 @@ import ResourceList from '@/components/ResourceList'
 const Home = () => {
   return (
     <Box sx={pageBoxContainerStyle}>
-      <Typography variant="h3" component={Link} to="/upload" sx={clearHomeLinkClass}>
+      <Typography variant="h3" component={Link} to="/aporteform" sx={clearHomeLinkClass}>
         Subir aporte
       </Typography>
 
