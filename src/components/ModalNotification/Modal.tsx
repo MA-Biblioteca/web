@@ -1,35 +1,31 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import "./Modal.css";
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import './Modal.css'
 
-const UploadNotificationModal = ({ type }) => {
-  const isSuccess = type === "success";
-  const navigate = useNavigate();
+const UploadNotificationModal: React.FC<{ type: string }> = ({ type }) => {
+  const isSuccess = type === 'success'
+  const navigate = useNavigate()
 
   const handleHome = () => {
-    navigate("/");
-  };
+    navigate('/')
+  }
 
   const handleRetry = () => {
-    navigate("/subir"); // Ajusta la ruta según corresponda para reintentar
-  };
+    navigate('/subir') // Ajusta la ruta según corresponda para reintentar
+  }
 
   const handleNew = () => {
-    navigate("/subir"); // Ajusta la ruta según corresponda para subir otro aporte
-  };
+    navigate('/subir') // Ajusta la ruta según corresponda para subir otro aporte
+  }
 
   return (
     <div className="modal-overlay">
-      <div className={`modal-box ${isSuccess ? "success" : "error"}`}>
-        <h2>
-          {isSuccess
-            ? "✅ Subida Exitosa"
-            : "⚠️ Error en la Subida"}
-        </h2>
+      <div className={`modal-box ${isSuccess ? 'success' : 'error'}`}>
+        <h2>{isSuccess ? '✅ Subida Exitosa' : '⚠️ Error en la Subida'}</h2>
         <p>
           {isSuccess
-            ? "Tu contenido fue cargado correctamente."
-            : "Hubo un problema al cargar tu contenido."}
+            ? 'Tu contenido fue cargado correctamente.'
+            : 'Hubo un problema al cargar tu contenido.'}
         </p>
 
         <div className="modal-actions">
@@ -49,7 +45,7 @@ const UploadNotificationModal = ({ type }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default UploadNotificationModal;
+export default UploadNotificationModal

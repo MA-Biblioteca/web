@@ -3,5 +3,5 @@ export const resourceListContainerStyle = {
   margin: '3rem auto',
   minWidth: '300px',
   textAlign: 'center',
-  backgroundColor: 'lightblue'
+  backgroundColor: 'lightblue',
 }

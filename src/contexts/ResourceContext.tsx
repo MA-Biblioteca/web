@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, ReactNode } from 'react'
 
 interface Resource {
   carreraId: string
@@ -24,17 +24,21 @@ const initialResource: Resource = {
   tipoRecurso: '',
   titulo: '',
   descripcion: '',
-  archivos: []
+  archivos: [],
 }
 
-const ResourceContext = createContext<ResourceContextType | undefined>(undefined)
+const ResourceContext = createContext<ResourceContextType | undefined>(
+  undefined
+)
 
-export const ResourceProvider = ({ children }: { children: ReactNode }) => {
+export const ResourceProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [resource, setResourceState] = useState<Resource>(initialResource)
 
   const setResource = (data: Partial<Resource>) => {
     console.log('Seteando recurso con:', data)
-    setResourceState(prev => ({ ...prev, ...data }))
+    setResourceState((prev) => ({ ...prev, ...data }))
   }
 
   const resetResource = () => {
@@ -55,12 +59,14 @@ export const ResourceProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <ResourceContext.Provider value={{
-      resource,
-      setResource,
-      resetResource,
-      isValid
-    }}>
+    <ResourceContext.Provider
+      value={{
+        resource,
+        setResource,
+        resetResource,
+        isValid,
+      }}
+    >
       {children}
     </ResourceContext.Provider>
   )
@@ -69,7 +75,9 @@ export const ResourceProvider = ({ children }: { children: ReactNode }) => {
 export const useResource = () => {
   const context = useContext(ResourceContext)
   if (!context) {
-    throw new Error('useResource es un hook que debe estar dentro de un Provider en main.tsx')
+    throw new Error(
+      'useResource es un hook que debe estar dentro de un Provider en main.tsx'
+    )
   }
   return context
 }

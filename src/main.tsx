@@ -7,7 +7,7 @@ import './styles/global.css'
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import Explore from './pages/Explore'
-import Upload from './pages/Upload'
+// import Upload from './pages/Upload'
 import Moderation from './pages/Moderation'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
@@ -37,12 +37,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="explore" element={<Explore />} />
-              <Route path="upload" element={<Upload />} />
-              <Route path="aporteform" element={
-                <AporteProvider>
-                  <AporteForm />
-                </AporteProvider>
-              } />
+              <Route
+                path="upload"
+                element={
+                  <AporteProvider>
+                    <AporteForm />
+                  </AporteProvider>
+                }
+              />
               <Route path="moderation" element={<Moderation />} />
               <Route path="profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
@@ -51,5 +53,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </ThemeProvider>
       </BrowserRouter>
     </ResourceProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 )

@@ -1,21 +1,30 @@
-import React from "react";
-import { useAporte } from "./AporteContext";
-import "./AporteForm.css";
-import { useNavigate } from "react-router-dom";
+import React from 'react'
+import { useAporte } from './AporteContext'
+import './AporteForm.css'
+import { useNavigate } from 'react-router-dom'
 
 const AporteForm: React.FC = () => {
-  const { data, setData } = useAporte();
-  const navigate = useNavigate();
+  const { data, setData } = useAporte()
+  const navigate = useNavigate()
 
-  const carreras = ["Ingeniería", "Medicina", "Derecho"];
-  const anios = ["1° Año", "2° Año", "3° Año"];
-  const materias = ["Matemática", "Biología", "Historia"];
-  const tipos = ["Primer Parcial", "Final", "TP","Segundo Parcial","Primer parcial-primer recuperatorio","Primer parcial-segundo recuperatorio","Segundo parcial-primer recuperatorio","Segundo parcial-segundo recuperatorio"];
+  const carreras = ['Ingeniería', 'Medicina', 'Derecho']
+  const anios = ['1° Año', '2° Año', '3° Año']
+  const materias = ['Matemática', 'Biología', 'Historia']
+  const tipos = [
+    'Primer Parcial',
+    'Final',
+    'TP',
+    'Segundo Parcial',
+    'Primer parcial-primer recuperatorio',
+    'Primer parcial-segundo recuperatorio',
+    'Segundo parcial-primer recuperatorio',
+    'Segundo parcial-segundo recuperatorio',
+  ]
 
   const handleNext = () => {
-    console.log("Datos cargados:", data);
-    navigate("/upload");
-  };
+    console.log('Datos cargados:', data)
+    navigate('/upload')
+  }
 
   return (
     <div className="aporte-form">
@@ -25,7 +34,7 @@ const AporteForm: React.FC = () => {
         Carrera:
         <select
           value={data.carrera}
-          onChange={(e) => setData("carrera", e.target.value)}
+          onChange={(e) => setData('carrera', e.target.value)}
           disabled={!!data.anio}
         >
           <option value="">Seleccione...</option>
@@ -41,7 +50,7 @@ const AporteForm: React.FC = () => {
         Año:
         <select
           value={data.anio}
-          onChange={(e) => setData("anio", e.target.value)}
+          onChange={(e) => setData('anio', e.target.value)}
           disabled={!data.carrera || !!data.materia}
         >
           <option value="">Seleccione...</option>
@@ -57,7 +66,7 @@ const AporteForm: React.FC = () => {
         Materia:
         <select
           value={data.materia}
-          onChange={(e) => setData("materia", e.target.value)}
+          onChange={(e) => setData('materia', e.target.value)}
           disabled={!data.anio}
         >
           <option value="">Seleccione...</option>
@@ -78,7 +87,7 @@ const AporteForm: React.FC = () => {
               name="tipo"
               value={t}
               checked={data.tipo === t}
-              onChange={(e) => setData("tipo", e.target.value)}
+              onChange={(e) => setData('tipo', e.target.value)}
             />
             {t}
           </label>
@@ -89,7 +98,7 @@ const AporteForm: React.FC = () => {
         Siguiente
       </button>
     </div>
-  );
-};
+  )
+}
 
-export default AporteForm;
+export default AporteForm
