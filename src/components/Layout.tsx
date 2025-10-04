@@ -5,11 +5,17 @@ import Topbar from './Topbar'
 
 const Layout: React.FC = () => {
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Topbar />
-      <main>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          bgcolor: 'background.default',
+        }}
+      >
         <Outlet />
-      </main>
+      </Box>
     </Box>
   )
 }

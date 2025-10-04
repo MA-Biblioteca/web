@@ -11,9 +11,9 @@ import Explore from './pages/Explore'
 import Moderation from './pages/Moderation'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
-import AporteForm from './pages/aporte/AporteFrom'
+import ContributionForm from './pages/contribution/ContributionFrom'
 import { ResourceProvider } from './contexts/ResourceContext'
-import { AporteProvider } from './pages/aporte/AporteContext'
+import { ContributionProvider } from './pages/contribution/ContributionContext'
 
 const theme = createTheme({
   palette: {
@@ -40,9 +40,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Route
                 path="upload"
                 element={
-                  <AporteProvider>
-                    <AporteForm />
-                  </AporteProvider>
+                  <ContributionProvider>
+                    <ContributionForm />
+                  </ContributionProvider>
                 }
               />
               <Route path="moderation" element={<Moderation />} />

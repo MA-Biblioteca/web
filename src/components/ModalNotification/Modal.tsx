@@ -15,7 +15,7 @@ const UploadNotificationModal: React.FC<{ type: string }> = ({ type }) => {
   }
 
   const handleNew = () => {
-    navigate('/subir') // Ajusta la ruta según corresponda para subir otro aporte
+    navigate('/subir') // Ajusta la ruta según corresponda para subir otro contribution
   }
 
   return (
@@ -35,7 +35,7 @@ const UploadNotificationModal: React.FC<{ type: string }> = ({ type }) => {
 
           {isSuccess ? (
             <button className="btn secondary" onClick={handleNew}>
-              Subir otro aporte
+              Subir otra contribución
             </button>
           ) : (
             <button className="btn secondary" onClick={handleRetry}>
