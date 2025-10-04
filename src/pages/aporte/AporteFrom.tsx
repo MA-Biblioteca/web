@@ -1,7 +1,9 @@
-import React, { useState, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useAporte } from './AporteContext'
 import './AporteForm.css'
 import { useNavigate } from 'react-router-dom'
+import { getCareers, getSubjects } from '../../services'
+import ModalNotification from '../../components/ModalNotification/Modal'
 
 const AporteForm: React.FC = () => {
   const { data, setData } = useAporte()
@@ -9,14 +11,34 @@ const AporteForm: React.FC = () => {
   const [files, setFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-  const carreras = ['Ingeniería en Sistemas de Informacion', 'Ingenieria Mecanica', 'Ingenieria Civil']
-  const anios = ['1° Año', '2° Año', '3° Año']
-  const materias = ['Algoritmos y Estructura de Datos', 'Metodologias Agiles', 'Diseño de Sistemas']
+  const [carreras, setCarreras] = useState<string[]>([])
+  const [materias, setMaterias] = useState<string[]>([])
+  const [showModal, setShowModal] = useState(false)
+  const anios = ['1° Año', '2° Año', '3° Año', '4° Año', '5° Año']
   const tipos = [
     'Primer Parcial', 'Final', 'TP', 'Segundo Parcial',
     'Primer parcial-primer recuperatorio', 'Primer parcial-segundo recuperatorio',
     'Segundo parcial-primer recuperatorio', 'Segundo parcial-segundo recuperatorio',
   ]
+
+  useEffect(() => {
+    getCareers()
+      .then((res) => setCarreras(res.map((c: any) => c.nombre || c.name || c)))
+      .catch(() => setCarreras([]))
+  }, [])
+
+  useEffect(() => {
+    if (data.carrera && data.anio) {
+      const anioNum = data.anio.split('°')[0]
+      getSubjects(data.carrera, anioNum)
+        .then((res) => setMaterias(res.map((m: any) => m.nombre || m.name || m)))
+        .catch(() => setMaterias([]))
+    } else {
+      setMaterias([])
+    }
+    setData('materia', '')
+    // eslint-disable-next-line
+  }, [data.carrera, data.anio])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
@@ -54,17 +76,13 @@ const AporteForm: React.FC = () => {
     if (!data.carrera || !data.anio || !data.materia || !data.tipo) {
       return alert('Completa todos los campos antes de confirmar')
     }
+    setShowModal(true)
+  }
 
-    console.log('Formulario confirmado:', {
-      carrera: data.carrera,
-      anio: data.anio,
-      materia: data.materia,
-      tipo: data.tipo,
-      files,
-    })
-
-    alert('Formulario confirmado (sin subir archivos aún)')
-    navigate('/upload') // o limpiar form si querés quedarse en la misma página
+  const handleCloseModal = () => {
+    setShowModal(false)
+    // Si quieres redirigir después de cerrar el modal, descomenta la siguiente línea:
+    // navigate('/upload')
   }
 
   return (
@@ -75,7 +93,9 @@ const AporteForm: React.FC = () => {
         Carrera:
         <select value={data.carrera} onChange={(e) => setData('carrera', e.target.value)} disabled={!!data.anio}>
           <option value="">Seleccione...</option>
-          {carreras.map((c) => <option key={c} value={c}>{c}</option>)}
+          {carreras.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
         </select>
       </label>
 
@@ -83,15 +103,25 @@ const AporteForm: React.FC = () => {
         Año:
         <select value={data.anio} onChange={(e) => setData('anio', e.target.value)} disabled={!data.carrera || !!data.materia}>
           <option value="">Seleccione...</option>
-          {anios.map((a) => <option key={a} value={a}>{a}</option>)}
+          {anios.map((a) => (
+            <option key={a} value={a}>{a}</option>
+          ))}
         </select>
       </label>
 
       <label>
         Materia:
-        <select value={data.materia} onChange={(e) => setData('materia', e.target.value)} disabled={!data.anio}>
-          <option value="">Seleccione...</option>
-          {materias.map((m) => <option key={m} value={m}>{m}</option>)}
+        <select value={data.materia} onChange={(e) => setData('materia', e.target.value)} disabled={!data.anio || materias.length === 0}>
+          {materias.length === 0 ? (
+            <option value="">Ninguna materia cargada</option>
+          ) : (
+            <>
+              <option value="">Seleccione...</option>
+              {materias.map((m) => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </>
+          )}
         </select>
       </label>
 
@@ -99,7 +129,13 @@ const AporteForm: React.FC = () => {
         <legend>Tipo:</legend>
         {tipos.map((t) => (
           <label key={t}>
-            <input type="radio" name="tipo" value={t} checked={data.tipo === t} onChange={(e) => setData('tipo', e.target.value)} />
+            <input
+              type="radio"
+              name="tipo"
+              value={t}
+              checked={data.tipo === t}
+              onChange={(e) => setData('tipo', e.target.value)}
+            />
             {t}
           </label>
         ))}
@@ -117,7 +153,7 @@ const AporteForm: React.FC = () => {
         {files.map((file, idx) => (
           <li key={idx}>
             {file.name}
-            <button type="button" className="remove-file-btn" onClick={() => handleRemoveFile(idx)}>❌</button>
+            <button type="button" onClick={() => handleRemoveFile(idx)}>Eliminar</button>
           </li>
         ))}
       </ul>
@@ -128,6 +164,13 @@ const AporteForm: React.FC = () => {
           Confirmar
         </button>
       </div>
+
+      {showModal && (
+        <ModalNotification
+          message="¡Aporte enviado correctamente!"
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   )
 }
