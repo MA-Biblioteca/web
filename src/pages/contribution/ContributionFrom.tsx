@@ -160,7 +160,6 @@ const ContributionForm: React.FC = () => {
   }
 
   const handleConfirm = async () => {
-    // Validation
     if (
       !data.careerId ||
       !data.year ||
@@ -192,9 +191,10 @@ const ContributionForm: React.FC = () => {
       })
 
       setShowModal(true)
-    } catch (error) {
+    } catch (error: any) {
+      console.log(error.response.data.message)
       setFileError(
-        'Error al enviar la contribución. Por favor, intenta nuevamente.'
+        error.response.data.message || 'Error al enviar la contribución. Por favor, intenta nuevamente.'
       )
     } finally {
       setIsSubmitting(false)
