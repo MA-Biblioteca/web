@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box } from '@mui/material'
-import ResourceList from '@/components/ResourceList'
+import ResourceListWrapper from '@/components/ResourceListWrapper'
 
 const Home: React.FC = () => {
   return (
@@ -10,7 +10,7 @@ const Home: React.FC = () => {
         backgroundColor: '#f8f9fa',
       }}
     >
-      <ResourceList />
+      <ResourceListWrapper />
     </Box>
   )
 }
