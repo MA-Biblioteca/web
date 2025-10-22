@@ -12,6 +12,7 @@ import Moderation from './pages/Moderation'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 import ContributionForm from './pages/contribution/ContributionFrom'
+import ContributionDetail from './pages/ContributionDetail'
 import { ResourceProvider } from './contexts/ResourceContext'
 import { ContributionProvider } from './pages/contribution/ContributionContext'
 
@@ -37,6 +38,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="explore" element={<Explore />} />
+              <Route path="contributions/:id" element={<ContributionDetail />} />
               <Route
                 path="upload"
                 element={

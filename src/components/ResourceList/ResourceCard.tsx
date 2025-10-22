@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Card,
   CardContent,
@@ -11,6 +12,7 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
+  CardActionArea,
 } from '@mui/material'
 import {
   Description as DescriptionIcon,
@@ -27,6 +29,7 @@ interface ResourceCardProps {
 }
 
 const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
+  const navigate = useNavigate()
   const [downloading, setDownloading] = useState(false)
   const [snackbar, setSnackbar] = useState<{
     open: boolean
@@ -38,7 +41,8 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
     severity: 'success',
   })
 
-  const handleDownload = async () => {
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent card click
     if (contribution.files.length === 0) return
 
     setDownloading(true)
@@ -58,6 +62,10 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
     } finally {
       setDownloading(false)
     }
+  }
+
+  const handleCardClick = () => {
+    navigate(`/contributions/${contribution.id}`)
   }
 
   const handleCloseSnackbar = () => {
@@ -93,6 +101,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
         '&:hover': {
           transform: 'translateY(-8px)',
           boxShadow: '0 12px 24px rgba(0,0,0,0.15)',
+          cursor: 'pointer',
         },
         borderRadius: '12px',
         overflow: 'hidden',
@@ -107,7 +116,8 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
         }}
       />
 
-      <CardContent sx={{ flexGrow: 1, p: 3 }}>
+      <CardActionArea onClick={handleCardClick} sx={{ flexGrow: 1 }}>
+        <CardContent sx={{ p: 3 }}>
         {/* Header with title and resource type chip */}
         <Box sx={{ mb: 2 }}>
           <Stack
@@ -265,6 +275,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
           </Box>
         )}
       </CardContent>
+      </CardActionArea>
 
       <Snackbar
         open={snackbar.open}

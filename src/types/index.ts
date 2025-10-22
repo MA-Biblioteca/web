@@ -25,6 +25,27 @@ export interface ResourceFile {
   path: string
 }
 
+export interface Comment {
+  id: number
+  content: string
+  contributionId: number
+  createdAt: string
+  updatedAt: string
+  user?: {
+    id: number
+    name: string
+  }
+}
+
+export interface Rating {
+  id: number
+  rating: number
+  contributionId: number
+  userId: number
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Contribution {
   id: number
   title: string
@@ -37,4 +58,8 @@ export interface Contribution {
   deletedAt: string | null
   careerSubject: CareerSubject
   files: ResourceFile[]
+  comments?: Comment[]
+  averageRating?: number
+  totalRatings?: number
+  userRating?: number
 }
