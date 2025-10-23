@@ -51,6 +51,16 @@ export const getContributions = async (): Promise<Contribution[]> => {
   }
 }
 
+export const getContributionById = async (id: number): Promise<Contribution> => {
+  try {
+    const response = await api.get(`/contributions/${id}`)
+    return response.data.data
+  } catch (error) {
+    console.error('Error fetching contribution:', error)
+    throw error
+  }
+}
+
 export const downloadFile = async (fileId: number, fileName: string) => {
   try {
     const response = await api.get(`/contributions/files/${fileId}`, {

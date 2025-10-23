@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Card,
   CardContent,
@@ -21,12 +22,14 @@ import {
 } from '@mui/icons-material'
 import { Contribution } from '@/types'
 import { downloadAllFiles } from '@/services/contribution'
+import { Visibility } from '@mui/icons-material'
 
 interface ResourceCardProps {
   contribution: Contribution
 }
 
 const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
+  const navigate = useNavigate()
   const [downloading, setDownloading] = useState(false)
   const [snackbar, setSnackbar] = useState<{
     open: boolean
@@ -38,7 +41,14 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
     severity: 'success',
   })
 
-  const handleDownload = async () => {
+  const handleCardClick = () => {
+    navigate(`/contributions/${contribution.id}`)
+  }
+
+  const handleDownload = async (event: React.MouseEvent) => {
+    // Prevenir que el click en el botón de descarga active el click de la card
+    event.stopPropagation()
+
     if (contribution.files.length === 0) return
 
     setDownloading(true)
@@ -85,11 +95,13 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
 
   return (
     <Card
+      onClick={handleCardClick}
       sx={{
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         transition: 'all 0.3s ease-in-out',
+        cursor: 'pointer',
         '&:hover': {
           transform: 'translateY(-8px)',
           boxShadow: '0 12px 24px rgba(0,0,0,0.15)',
@@ -218,30 +230,37 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
                   {contribution.files.length} {contribution.files.length === 1 ? 'archivo' : 'archivos'}
                 </Typography>
               </Box>
-              <Tooltip title={downloading ? 'Descargando...' : 'Descargar archivos'}>
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={handleDownload}
-                    disabled={downloading}
-                    sx={{
-                      color: getResourceTypeColor(contribution.resourceType),
-                      '&:hover': {
-                        backgroundColor: `${getResourceTypeColor(contribution.resourceType)}15`,
-                      },
-                      '&.Mui-disabled': {
-                        color: '#ccc',
-                      },
-                    }}
-                  >
-                    {downloading ? (
-                      <CircularProgress size={20} />
-                    ) : (
-                      <DownloadIcon fontSize="small" />
-                    )}
-                  </IconButton>
-                </span>
-              </Tooltip>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <Tooltip title={'Visualizaciones totales'}>
+                  <span style={{ fontSize: '.8rem', position: 'relative', top: '.2rem', color: '#666' }}>
+                    {contribution.views} <Visibility sx={{ fontSize: 16, verticalAlign: 'middle', color: '#666' }} />
+                  </span>
+                </Tooltip>
+                <Tooltip title={downloading ? 'Descargando...' : 'Descargar archivos'}>
+                  <span>
+                    <IconButton
+                      size="small"
+                      onClick={handleDownload}
+                      disabled={downloading}
+                      sx={{
+                        color: getResourceTypeColor(contribution.resourceType),
+                        '&:hover': {
+                          backgroundColor: `${getResourceTypeColor(contribution.resourceType)}15`,
+                        },
+                        '&.Mui-disabled': {
+                          color: '#ccc',
+                        },
+                      }}
+                    >
+                      {downloading ? (
+                        <CircularProgress size={20} />
+                      ) : (
+                        <DownloadIcon fontSize="small" />
+                      )}
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </div>
             </Box>
           </Box>
         )}

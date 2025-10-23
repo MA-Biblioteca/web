@@ -59,7 +59,7 @@ const ResourceList: React.FC = () => {
     )
   }
 
-  if (contributions.length === 0) {
+  if (contributions?.length === 0) {
     return (
       <Box
         sx={{
@@ -96,7 +96,7 @@ const ResourceList: React.FC = () => {
       </Box>
 
       <Grid container spacing={3}>
-        {contributions.map((contribution) => (
+        {contributions?.map((contribution) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={contribution.id}>
             <ResourceCard contribution={contribution} />
           </Grid>
