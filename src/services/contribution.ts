@@ -98,3 +98,21 @@ export const downloadAllFiles = async (
     throw error
   }
 }
+
+export const addComment = async () => {
+  try {
+    // TODO: Implement add comment
+  } catch (error) {
+    console.error('Error adding comment:', error)
+    throw error
+  }
+}
+
+export const rateContribution = async () => {
+  try {
+    // TODO: Implement rate contribution
+  } catch (error) {
+    console.error('Error rating contribution:', error)
+    throw error
+  }
+}
