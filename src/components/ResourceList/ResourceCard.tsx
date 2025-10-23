@@ -24,6 +24,7 @@ import {
 import { Contribution } from '@/types'
 import { downloadAllFiles } from '@/services/contribution'
 import { Visibility } from '@mui/icons-material'
+import { iconSx } from '@/styles/global'
 
 interface ResourceCardProps {
   contribution: Contribution
@@ -176,13 +177,13 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
           <Box sx={{ mb: 2 }}>
             <Stack spacing={1}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <SchoolIcon sx={{ fontSize: 18, color: '#666' }} />
+                <SchoolIcon sx={iconSx} />
                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
                   {contribution.careerSubject.career.name}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <DescriptionIcon sx={{ fontSize: 18, color: '#666' }} />
+                <DescriptionIcon sx={iconSx} />
                 <Typography
                   variant="body2"
                   sx={{
@@ -201,7 +202,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
           <Box sx={{ mb: 2 }}>
             <Stack direction="row" spacing={2} alignItems="center">
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <CalendarIcon sx={{ fontSize: 16, color: '#666' }} />
+                <CalendarIcon sx={iconSx} />
                 <Typography variant="caption" color="text.secondary">
                   Año {contribution.year}
                 </Typography>
@@ -226,15 +227,15 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
             >
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <AttachFileIcon sx={{ fontSize: 18, color: '#666' }} />
+                  <AttachFileIcon sx={iconSx} />
                   <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
                     {contribution.files.length} {contribution.files.length === 1 ? 'archivo' : 'archivos'}
                   </Typography>
                 </Box>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                  <Tooltip title={'Visualizaciones totales'}>
-                    <span style={{ fontSize: '.8rem', position: 'relative', top: '.2rem', color: '#666' }}>
-                      {contribution.views} <Visibility sx={{ fontSize: 16, verticalAlign: 'middle', color: '#666' }} />
+                  <Tooltip title='Visualizaciones totales'>
+                    <span style={{ ...iconSx, fontSize: '.8rem', position: 'relative', top: '.3rem' }}>
+                      {contribution.views} <Visibility sx={{ ...iconSx, verticalAlign: 'middle' }} />
                     </span>
                   </Tooltip>
                   <Tooltip title={downloading ? 'Descargando...' : 'Descargar archivos'}>
