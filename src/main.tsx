@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
@@ -12,6 +11,7 @@ import Moderation from './pages/Moderation'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 import ContributionForm from './pages/contribution/ContributionFrom'
+import ContributionDetail from './pages/ContributionDetail'
 import { ResourceProvider } from './contexts/ResourceContext'
 import { ContributionProvider } from './pages/contribution/ContributionContext'
 
@@ -28,30 +28,29 @@ const theme = createTheme({
 })
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <ResourceProvider>
-      <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="explore" element={<Explore />} />
-              <Route
-                path="upload"
-                element={
-                  <ContributionProvider>
-                    <ContributionForm />
-                  </ContributionProvider>
-                }
-              />
-              <Route path="moderation" element={<Moderation />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </ThemeProvider>
-      </BrowserRouter>
-    </ResourceProvider>
-  </React.StrictMode>
+  <ResourceProvider>
+    <BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="explore" element={<Explore />} />
+            <Route path="contributions/:id" element={<ContributionDetail />} />
+            <Route
+              path="upload"
+              element={
+                <ContributionProvider>
+                  <ContributionForm />
+                </ContributionProvider>
+              }
+            />
+            <Route path="moderation" element={<Moderation />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </ThemeProvider>
+    </BrowserRouter>
+  </ResourceProvider>
 )
