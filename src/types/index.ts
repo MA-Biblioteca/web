@@ -52,6 +52,7 @@ export interface Contribution {
   description: string
   year: number
   resourceType: string
+  views: number
   careerSubjectId: number
   createdAt: string
   updatedAt: string

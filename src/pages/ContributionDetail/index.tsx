@@ -10,25 +10,26 @@ import {
   Button,
   CircularProgress,
   Divider,
-  TextField,
-  Alert,
-  Snackbar,
   Card,
   CardContent,
+  Alert,
+  TextField,
   Avatar,
+  Snackbar,
 } from '@mui/material'
 import {
   ArrowBack as ArrowBackIcon,
   School as SchoolIcon,
   CalendarToday as CalendarIcon,
-  Description as DescriptionIcon,
   AttachFile as AttachFileIcon,
   Download as DownloadIcon,
+  Description as DescriptionIcon,
   Send as SendIcon,
 } from '@mui/icons-material'
-import { getContributionById, addComment, rateContribution, downloadAllFiles } from '@/services/contribution'
+import { getContributionById, downloadAllFiles } from '@/services/contribution'
 import { Contribution, Comment } from '@/types'
 import StarRating from '@/components/StarRating'
+import { bigIconSx } from '@/styles/global'
 
 const ContributionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -69,7 +70,7 @@ const ContributionDetail: React.FC = () => {
     fetchContribution()
   }, [id])
 
-  const handleRatingChange = async (newRating: number) => {
+  const handleRatingChange = async () => {
     if (!contribution) return
 
     try {
@@ -222,16 +223,30 @@ const ContributionDetail: React.FC = () => {
             <Typography variant="h4" component="h1" sx={{ fontWeight: 700, flex: 1 }}>
               {contribution.title}
             </Typography>
-            <Chip
-              label={contribution.resourceType}
-              sx={{
-                backgroundColor: getResourceTypeColor(contribution.resourceType),
-                color: 'white',
-                fontWeight: 600,
-                textTransform: 'capitalize',
-                fontSize: '0.875rem',
-              }}
-            />
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <Chip
+                label={(contribution.views ?? 0) + ` vista${contribution.views !== 1 ? 's' : ''}`}
+                sx={{
+                  backgroundColor: getResourceTypeColor(contribution.resourceType),
+                  color: 'white',
+                  fontWeight: 600,
+                  textTransform: 'capitalize',
+                  fontSize: '0.875rem',
+                }}
+                variant="outlined"
+              />
+              <Chip
+                label={contribution.resourceType}
+                sx={{
+                  backgroundColor: getResourceTypeColor(contribution.resourceType),
+                  color: 'white',
+                  fontWeight: 600,
+                  textTransform: 'capitalize',
+                  fontSize: '0.875rem',
+                }}
+              />
+            </div>
           </Stack>
 
           {/* Rating */}
@@ -252,20 +267,20 @@ const ContributionDetail: React.FC = () => {
           {/* Metadata */}
           <Stack spacing={2} sx={{ mb: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <SchoolIcon sx={{ color: '#666' }} />
+              <SchoolIcon sx={bigIconSx} />
               <Typography variant="body1" color="text.secondary">
                 {contribution.careerSubject.career.name}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <DescriptionIcon sx={{ color: '#666' }} />
+              <DescriptionIcon sx={bigIconSx} />
               <Typography variant="body1" sx={{ fontWeight: 500 }}>
                 {contribution.careerSubject.subject.name}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <CalendarIcon sx={{ fontSize: 20, color: '#666' }} />
+                <CalendarIcon sx={bigIconSx} />
                 <Typography variant="body2" color="text.secondary">
                   Año {contribution.year}
                 </Typography>
@@ -301,7 +316,7 @@ const ContributionDetail: React.FC = () => {
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <AttachFileIcon sx={{ color: '#666' }} />
+                    <AttachFileIcon sx={bigIconSx} />
                     <Typography variant="body1">
                       {contribution.files.length} {contribution.files.length === 1 ? 'archivo' : 'archivos'}
                     </Typography>
@@ -405,9 +420,8 @@ const ContributionDetail: React.FC = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </Box >
   )
 }
 
 export default ContributionDetail
-

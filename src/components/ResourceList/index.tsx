@@ -54,7 +54,7 @@ const ResourceList: React.FC = () => {
     )
   }
 
-  if (contributions.length === 0) {
+  if (contributions?.length === 0) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
         <Typography variant="h6" color="text.secondary">
