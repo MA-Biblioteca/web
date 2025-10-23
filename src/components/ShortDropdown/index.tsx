@@ -29,8 +29,8 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
         const dateB = new Date(b.createdAt).getTime()
         return asc ? dateA - dateB : dateB - dateA
       } else {
-        const ratingA = a.rating ?? 0
-        const ratingB = b.rating ?? 0
+        const ratingA = a.averageRating ?? 0
+        const ratingB = b.averageRating ?? 0
         return asc ? ratingA - ratingB : ratingB - ratingA
       }
     })
