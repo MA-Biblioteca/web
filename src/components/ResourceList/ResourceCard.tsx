@@ -233,7 +233,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
                   </Typography>
                 </Box>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                  <Tooltip title='Visualizaciones totales'>
+                  <Tooltip title="Visualizaciones totales">
                     <span style={{ ...iconSx, fontSize: '.8rem', position: 'relative', top: '.3rem' }}>
                       {contribution.views} <Visibility sx={{ ...iconSx, verticalAlign: 'middle' }} />
                     </span>
