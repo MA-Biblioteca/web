@@ -102,14 +102,20 @@ export const downloadAllFiles = async (
   }
 }
 
-export const addComment = async () => {
+export const addComment = async (contributionId: number, content: string) => {
   try {
-    // TODO: Implement add comment
+    const response = await api.post('/comments', {
+      contributionId,
+      content,
+    })
+
+    return response.data
   } catch (error) {
     console.error('Error adding comment:', error)
     throw error
   }
 }
+
 
 export const rateContribution = async () => {
   try {
