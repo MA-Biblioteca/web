@@ -27,7 +27,7 @@ export interface ResourceFile {
 
 export interface Comment {
   id: number
-  content: string
+  text: string
   contributionId: number
   createdAt: string
   updatedAt: string

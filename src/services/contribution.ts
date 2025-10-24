@@ -54,7 +54,9 @@ export const getContributions = async (): Promise<Contribution[]> => {
   }
 }
 
-export const getContributionById = async (id: number): Promise<Contribution> => {
+export const getContributionById = async (
+  id: number
+): Promise<Contribution> => {
   try {
     const response = await api.get(`/contributions/${id}`)
     return response.data.data
@@ -98,38 +100,6 @@ export const downloadAllFiles = async (
     }
   } catch (error) {
     console.error('Error downloading files:', error)
-    throw error
-  }
-}
-
-export const addComment = async (contributionId: number, content: string) => {
-  try {
-    const response = await api.post(`/contributions/${contributionId}/comments`, { content })
-    return response.data
-  } catch (error) {
-    console.error('Error adding comment:', error)
-    throw error
-  }
-}
-
-
-export const getContributionRating = async (contributionId: number) => {
-  try {
-    const response = await api.get(`/contributions/${contributionId}/rating`)
-    return response.data.data 
-  } catch (error) {
-    console.error('Error fetching rating stats:', error)
-    throw error
-  }
-}
-
-
-export const rateContribution = async (contributionId: number, value: number) => {
-  try {
-    const response = await api.post(`/contributions/${contributionId}/rating`, { value })
-    return response.data
-  } catch (error) {
-    console.error('Error rating contribution:', error)
     throw error
   }
 }
