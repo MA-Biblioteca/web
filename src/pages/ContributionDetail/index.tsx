@@ -26,7 +26,7 @@ import {
   Description as DescriptionIcon,
   Send as SendIcon,
 } from '@mui/icons-material'
-import { getContributionById, downloadAllFiles } from '@/services/contribution'
+import { getContributionById, downloadAllFiles, rateContribution, addComment } from '@/services/contribution'
 import { Contribution, Comment } from '@/types'
 import StarRating from '@/components/StarRating'
 import { bigIconSx } from '@/styles/global'
@@ -40,6 +40,11 @@ const ContributionDetail: React.FC = () => {
   const [commentText, setCommentText] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
   const [downloading, setDownloading] = useState(false)
+
+  const [averageRating, setAverageRating] = useState<number>(0)
+  const [totalRatings, setTotalRatings] = useState<number>(0)
+  const [userRating, setUserRating] = useState<number>(0)
+
   const [snackbar, setSnackbar] = useState<{
     open: boolean
     message: string
@@ -49,16 +54,29 @@ const ContributionDetail: React.FC = () => {
     message: '',
     severity: 'success',
   })
+  
+
+ // Actualiza ratings cada vez que cambie la contribución
+  useEffect(() => {
+    if (!contribution) return
+    const ratings = contribution.ratings || []
+    const total = ratings.length
+    const avg = total ? ratings.reduce((sum, r) => sum + r.value, 0) / total : 0
+    const userVote = ratings.find(r => r.userId === 1)?.value || 0 
+    setAverageRating(avg)
+    setTotalRatings(total)
+    setUserRating(userVote)
+  }, [contribution])
 
   useEffect(() => {
     const fetchContribution = async () => {
       if (!id) return
-
       try {
         setLoading(true)
         const data = await getContributionById(Number(id))
         setContribution(data)
         setError(null)
+
       } catch (err) {
         console.error('Error loading contribution:', err)
         setError('Error al cargar el recurso. Por favor, intenta nuevamente.')
@@ -70,25 +88,30 @@ const ContributionDetail: React.FC = () => {
     fetchContribution()
   }, [id])
 
-  const handleRatingChange = async () => {
+  const handleRatingChange = async (newValue: number) => {
     if (!contribution) return
 
+    setUserRating(newValue)
+
     try {
-      // TODO: Implement rate contribution
+      await rateContribution(contribution.id, newValue)
+
+      const updated = await getContributionById(contribution.id)
+      setContribution(updated)
+
       setSnackbar({
         open: true,
         message: 'Calificación enviada correctamente',
         severity: 'success',
       })
-      // Refresh contribution to get updated rating
-      const updated = await getContributionById(contribution.id)
-      setContribution(updated)
     } catch (error) {
+      console.error('Error al enviar calificación:', error)
       setSnackbar({
         open: true,
         message: 'Error al enviar la calificación',
         severity: 'error',
       })
+      setUserRating(contribution.ratings?.find(r => r.userId === 1)?.value || 0)
     }
   }
 
@@ -98,14 +121,16 @@ const ContributionDetail: React.FC = () => {
 
     try {
       setSubmittingComment(true)
-      // TODO: Implement add comment
+      
+      await addComment(contribution.id, commentText)
+
       setSnackbar({
         open: true,
         message: 'Comentario agregado correctamente',
         severity: 'success',
       })
       setCommentText('')
-      // Refresh contribution to get updated comments
+      
       const updated = await getContributionById(contribution.id)
       setContribution(updated)
     } catch (error) {
@@ -255,11 +280,16 @@ const ContributionDetail: React.FC = () => {
               Califica este recurso:
             </Typography>
             <StarRating
-              value={contribution.userRating || contribution.averageRating || 0}
+              value={userRating || averageRating}
               onChange={handleRatingChange}
-              totalRatings={contribution.totalRatings}
+              totalRatings={totalRatings > 0 ? totalRatings : undefined} 
               size="large"
             />
+            {totalRatings === 0 && (
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+              Aún no hay calificaciones
+              </Typography>
+            )}
           </Box>
 
           <Divider sx={{ my: 3 }} />

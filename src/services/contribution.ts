@@ -102,18 +102,32 @@ export const downloadAllFiles = async (
   }
 }
 
-export const addComment = async () => {
+export const addComment = async (contributionId: number, content: string) => {
   try {
-    // TODO: Implement add comment
+    const response = await api.post(`/contributions/${contributionId}/comments`, { content })
+    return response.data
   } catch (error) {
     console.error('Error adding comment:', error)
     throw error
   }
 }
 
-export const rateContribution = async () => {
+
+export const getContributionRating = async (contributionId: number) => {
   try {
-    // TODO: Implement rate contribution
+    const response = await api.get(`/contributions/${contributionId}/rating`)
+    return response.data.data 
+  } catch (error) {
+    console.error('Error fetching rating stats:', error)
+    throw error
+  }
+}
+
+
+export const rateContribution = async (contributionId: number, value: number) => {
+  try {
+    const response = await api.post(`/contributions/${contributionId}/rating`, { value })
+    return response.data
   } catch (error) {
     console.error('Error rating contribution:', error)
     throw error
