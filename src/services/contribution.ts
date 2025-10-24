@@ -54,7 +54,9 @@ export const getContributions = async (): Promise<Contribution[]> => {
   }
 }
 
-export const getContributionById = async (id: number): Promise<Contribution> => {
+export const getContributionById = async (
+  id: number
+): Promise<Contribution> => {
   try {
     const response = await api.get(`/contributions/${id}`)
     return response.data.data
@@ -106,7 +108,8 @@ export const addComment = async (contributionId: number, content: string) => {
   try {
     const response = await api.post('/comments', {
       contributionId,
-      content,
+      text: content,
+      author: 'Test User',
     })
 
     return response.data
@@ -115,7 +118,6 @@ export const addComment = async (contributionId: number, content: string) => {
     throw error
   }
 }
-
 
 export const rateContribution = async () => {
   try {
