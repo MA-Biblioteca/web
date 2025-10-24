@@ -26,12 +26,14 @@ import {
   Description as DescriptionIcon,
   Send as SendIcon,
 } from '@mui/icons-material'
+
 import {
+  downloadFile,
   getContributionById,
   downloadAllFiles,
-  addComment,
-  downloadFile,
 } from '@/services/contribution'
+import { getRatingsByContribution, createRating } from '@/services/ratings'
+import { addComment } from '@/services/comments'
 import { Contribution, Comment } from '@/types'
 import StarRating from '@/components/StarRating'
 import { bigIconSx } from '@/styles/global'
@@ -45,6 +47,10 @@ const ContributionDetail: React.FC = () => {
   const [commentText, setCommentText] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
   const [downloading, setDownloading] = useState(false)
+
+  const [avgRating, setAvgRating] = useState<number>(0)
+  const [totalRatings, setTotalRatings] = useState<number>(0)
+
   const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
     null
   )
@@ -61,12 +67,12 @@ const ContributionDetail: React.FC = () => {
   useEffect(() => {
     const fetchContribution = async () => {
       if (!id) return
-
       try {
         setLoading(true)
         const data = await getContributionById(Number(id))
         setContribution(data)
         setError(null)
+        await getRatings()
       } catch (err) {
         console.error('Error loading contribution:', err)
         setError('Error al cargar el recurso. Por favor, intenta nuevamente.')
@@ -78,20 +84,30 @@ const ContributionDetail: React.FC = () => {
     fetchContribution()
   }, [id])
 
-  const handleRatingChange = async () => {
+  const getRatings = async () => {
+    if (!contribution) return
+    const { avgRating, ratingsCount } = await getRatingsByContribution(
+      Number(contribution?.id)
+    )
+    setAvgRating(avgRating ?? 0)
+    setTotalRatings(ratingsCount ?? 0)
+  }
+
+  const handleRatingChange = async (newValue: number) => {
     if (!contribution) return
 
     try {
-      // TODO: Implement rate contribution
+      await createRating(contribution.id, newValue)
+
       setSnackbar({
         open: true,
         message: 'Calificación enviada correctamente',
         severity: 'success',
       })
-      // Refresh contribution to get updated rating
-      const updated = await getContributionById(contribution.id)
-      setContribution(updated)
+
+      await getRatings()
     } catch (error) {
+      console.error('Error al enviar calificación:', error)
       setSnackbar({
         open: true,
         message: 'Error al enviar la calificación',
@@ -106,17 +122,18 @@ const ContributionDetail: React.FC = () => {
 
     try {
       setSubmittingComment(true)
-      console.log(contribution.id, commentText)
-      await addComment(contribution.id, commentText)
+
+      const newComment = await addComment(contribution.id, commentText)
+      setContribution({
+        ...contribution,
+        comments: [...(contribution.comments || []), newComment],
+      })
       setSnackbar({
         open: true,
         message: 'Comentario agregado correctamente',
         severity: 'success',
       })
       setCommentText('')
-      // Refresh contribution to get updated comments
-      const updated = await getContributionById(contribution.id)
-      setContribution(updated)
     } catch (error) {
       setSnackbar({
         open: true,
@@ -315,11 +332,20 @@ const ContributionDetail: React.FC = () => {
               Califica este recurso:
             </Typography>
             <StarRating
-              value={contribution.userRating || contribution.averageRating || 0}
+              value={avgRating}
               onChange={handleRatingChange}
-              totalRatings={contribution.totalRatings}
+              totalRatings={totalRatings > 0 ? totalRatings : undefined}
               size="large"
             />
+            {totalRatings === 0 && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5, display: 'block' }}
+              >
+                Aún no hay calificaciones
+              </Typography>
+            )}
           </Box>
 
           <Divider sx={{ my: 3 }} />
