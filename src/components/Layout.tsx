@@ -1,14 +1,21 @@
+import React from 'react'
 import { Box } from '@mui/material'
 import { Outlet } from 'react-router-dom'
 import Topbar from './Topbar'
 
-function Layout() {
+const Layout: React.FC = () => {
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Topbar />
-      <main>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          bgcolor: 'background.default',
+        }}
+      >
         <Outlet />
-      </main>
+      </Box>
     </Box>
   )
 }

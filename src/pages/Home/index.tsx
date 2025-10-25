@@ -1,17 +1,16 @@
-import { Box, Typography } from '@mui/material'
-import { Link } from 'react-router-dom'
-import { clearHomeLinkClass } from './styles'
-import { pageBoxContainerStyle } from '@/styles/global'
-import ResourceList from '@/components/ResourceList'
+import React from 'react'
+import { Box } from '@mui/material'
+import ResourceListWrapper from '@/components/ResourceListWrapper'
 
-const Home = () => {
+const Home: React.FC = () => {
   return (
-    <Box sx={pageBoxContainerStyle}>
-      <Typography variant="h3" component={Link} to="/upload" sx={clearHomeLinkClass}>
-        Subir aporte
-      </Typography>
-
-      <ResourceList />
+    <Box
+      sx={{
+        minHeight: 'calc(100vh - 64px)',
+        backgroundColor: '#f8f9fa',
+      }}
+    >
+      <ResourceListWrapper />
     </Box>
   )
 }
