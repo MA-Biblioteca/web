@@ -26,7 +26,14 @@ import {
   Description as DescriptionIcon,
   Send as SendIcon,
 } from '@mui/icons-material'
-import { getContributionById, downloadAllFiles } from '@/services/contribution'
+
+import {
+  downloadFile,
+  getContributionById,
+  downloadAllFiles,
+} from '@/services/contribution'
+import { getRatingsByContribution, createRating } from '@/services/ratings'
+import { addComment } from '@/services/comments'
 import { Contribution, Comment } from '@/types'
 import StarRating from '@/components/StarRating'
 import { bigIconSx } from '@/styles/global'
@@ -40,6 +47,13 @@ const ContributionDetail: React.FC = () => {
   const [commentText, setCommentText] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
   const [downloading, setDownloading] = useState(false)
+
+  const [avgRating, setAvgRating] = useState<number>(0)
+  const [totalRatings, setTotalRatings] = useState<number>(0)
+
+  const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
+    null
+  )
   const [snackbar, setSnackbar] = useState<{
     open: boolean
     message: string
@@ -53,12 +67,12 @@ const ContributionDetail: React.FC = () => {
   useEffect(() => {
     const fetchContribution = async () => {
       if (!id) return
-
       try {
         setLoading(true)
         const data = await getContributionById(Number(id))
         setContribution(data)
         setError(null)
+        await getRatings()
       } catch (err) {
         console.error('Error loading contribution:', err)
         setError('Error al cargar el recurso. Por favor, intenta nuevamente.')
@@ -70,20 +84,30 @@ const ContributionDetail: React.FC = () => {
     fetchContribution()
   }, [id])
 
-  const handleRatingChange = async () => {
+  const getRatings = async () => {
+    if (!contribution) return
+    const { avgRating, ratingsCount } = await getRatingsByContribution(
+      Number(contribution?.id)
+    )
+    setAvgRating(avgRating ?? 0)
+    setTotalRatings(ratingsCount ?? 0)
+  }
+
+  const handleRatingChange = async (newValue: number) => {
     if (!contribution) return
 
     try {
-      // TODO: Implement rate contribution
+      await createRating(contribution.id, newValue)
+
       setSnackbar({
         open: true,
         message: 'Calificación enviada correctamente',
         severity: 'success',
       })
-      // Refresh contribution to get updated rating
-      const updated = await getContributionById(contribution.id)
-      setContribution(updated)
+
+      await getRatings()
     } catch (error) {
+      console.error('Error al enviar calificación:', error)
       setSnackbar({
         open: true,
         message: 'Error al enviar la calificación',
@@ -98,16 +122,18 @@ const ContributionDetail: React.FC = () => {
 
     try {
       setSubmittingComment(true)
-      // TODO: Implement add comment
+
+      const newComment = await addComment(contribution.id, commentText)
+      setContribution({
+        ...contribution,
+        comments: [...(contribution.comments || []), newComment],
+      })
       setSnackbar({
         open: true,
         message: 'Comentario agregado correctamente',
         severity: 'success',
       })
       setCommentText('')
-      // Refresh contribution to get updated comments
-      const updated = await getContributionById(contribution.id)
-      setContribution(updated)
     } catch (error) {
       setSnackbar({
         open: true,
@@ -138,6 +164,26 @@ const ContributionDetail: React.FC = () => {
       })
     } finally {
       setDownloading(false)
+    }
+  }
+
+  const handleDownloadSingleFile = async (fileId: number, fileName: string) => {
+    setDownloadingFileId(fileId)
+    try {
+      await downloadFile(fileId, fileName)
+      setSnackbar({
+        open: true,
+        message: `Archivo "${fileName}" descargado correctamente`,
+        severity: 'success',
+      })
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Error al descargar el archivo',
+        severity: 'error',
+      })
+    } finally {
+      setDownloadingFileId(null)
     }
   }
 
@@ -195,7 +241,11 @@ const ContributionDetail: React.FC = () => {
         <Typography variant="h6" color="error">
           {error || 'Recurso no encontrado'}
         </Typography>
-        <Button variant="contained" startIcon={<ArrowBackIcon />} onClick={() => navigate('/')}>
+        <Button
+          variant="contained"
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/')}
+        >
           Volver al inicio
         </Button>
       </Box>
@@ -203,7 +253,13 @@ const ContributionDetail: React.FC = () => {
   }
 
   return (
-    <Box sx={{ minHeight: 'calc(100vh - 64px)', backgroundColor: '#f8f9fa', py: 4 }}>
+    <Box
+      sx={{
+        minHeight: 'calc(100vh - 64px)',
+        backgroundColor: '#f8f9fa',
+        py: 4,
+      }}
+    >
       <Container maxWidth="lg">
         {/* Header */}
         <Box sx={{ mb: 3 }}>
@@ -219,16 +275,31 @@ const ContributionDetail: React.FC = () => {
         {/* Main Content */}
         <Paper elevation={2} sx={{ p: 4, mb: 3, borderRadius: 2 }}>
           {/* Title and Resource Type */}
-          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2} sx={{ mb: 3 }}>
-            <Typography variant="h4" component="h1" sx={{ fontWeight: 700, flex: 1 }}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+            spacing={2}
+            sx={{ mb: 3 }}
+          >
+            <Typography
+              variant="h4"
+              component="h1"
+              sx={{ fontWeight: 700, flex: 1 }}
+            >
               {contribution.title}
             </Typography>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
               <Chip
-                label={(contribution.views ?? 0) + ` vista${contribution.views !== 1 ? 's' : ''}`}
+                label={
+                  (contribution.views ?? 0) +
+                  ` vista${contribution.views !== 1 ? 's' : ''}`
+                }
                 sx={{
-                  backgroundColor: getResourceTypeColor(contribution.resourceType),
+                  backgroundColor: getResourceTypeColor(
+                    contribution.resourceType
+                  ),
                   color: 'white',
                   fontWeight: 600,
                   textTransform: 'capitalize',
@@ -239,7 +310,9 @@ const ContributionDetail: React.FC = () => {
               <Chip
                 label={contribution.resourceType}
                 sx={{
-                  backgroundColor: getResourceTypeColor(contribution.resourceType),
+                  backgroundColor: getResourceTypeColor(
+                    contribution.resourceType
+                  ),
                   color: 'white',
                   fontWeight: 600,
                   textTransform: 'capitalize',
@@ -251,15 +324,28 @@ const ContributionDetail: React.FC = () => {
 
           {/* Rating */}
           <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              sx={{ mb: 1 }}
+            >
               Califica este recurso:
             </Typography>
             <StarRating
-              value={contribution.userRating || contribution.averageRating || 0}
+              value={avgRating}
               onChange={handleRatingChange}
-              totalRatings={contribution.totalRatings}
+              totalRatings={totalRatings > 0 ? totalRatings : undefined}
               size="large"
             />
+            {totalRatings === 0 && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5, display: 'block' }}
+              >
+                Aún no hay calificaciones
+              </Typography>
+            )}
           </Box>
 
           <Divider sx={{ my: 3 }} />
@@ -301,7 +387,11 @@ const ContributionDetail: React.FC = () => {
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
               Descripción
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ lineHeight: 1.8, whiteSpace: 'pre-wrap' }}
+            >
               {contribution.description}
             </Typography>
           </Box>
@@ -311,32 +401,121 @@ const ContributionDetail: React.FC = () => {
             <>
               <Divider sx={{ my: 3 }} />
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                  Archivos adjuntos
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <AttachFileIcon sx={bigIconSx} />
-                    <Typography variant="body1">
-                      {contribution.files.length} {contribution.files.length === 1 ? 'archivo' : 'archivos'}
-                    </Typography>
-                  </Box>
-                  <Button
-                    variant="contained"
-                    startIcon={downloading ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
-                    onClick={handleDownload}
-                    disabled={downloading}
-                    sx={{
-                      backgroundColor: getResourceTypeColor(contribution.resourceType),
-                      '&:hover': {
-                        backgroundColor: getResourceTypeColor(contribution.resourceType),
-                        filter: 'brightness(0.9)',
-                      },
-                    }}
-                  >
-                    {downloading ? 'Descargando...' : 'Descargar'}
-                  </Button>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 2,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    Archivos adjuntos ({contribution.files.length})
+                  </Typography>
+                  {contribution.files.length > 1 && (
+                    <Button
+                      variant="outlined"
+                      startIcon={
+                        downloading ? (
+                          <CircularProgress size={20} color="inherit" />
+                        ) : (
+                          <DownloadIcon />
+                        )
+                      }
+                      onClick={handleDownload}
+                      disabled={downloading || downloadingFileId !== null}
+                      sx={{
+                        borderColor: getResourceTypeColor(
+                          contribution.resourceType
+                        ),
+                        color: getResourceTypeColor(contribution.resourceType),
+                        '&:hover': {
+                          borderColor: getResourceTypeColor(
+                            contribution.resourceType
+                          ),
+                          backgroundColor: `${getResourceTypeColor(
+                            contribution.resourceType
+                          )}10`,
+                        },
+                      }}
+                    >
+                      {downloading ? 'Descargando...' : 'Descargar todos'}
+                    </Button>
+                  )}
                 </Box>
+                <Stack spacing={2}>
+                  {contribution.files.map((file) => (
+                    <Box
+                      key={file.id}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        p: 2,
+                        backgroundColor: '#f5f5f5',
+                        borderRadius: 2,
+                        transition: 'background-color 0.2s',
+                        '&:hover': {
+                          backgroundColor: '#eeeeee',
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.5,
+                          flex: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        <AttachFileIcon sx={{ ...bigIconSx, flexShrink: 0 }} />
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {file.originalName}
+                        </Typography>
+                      </Box>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={
+                          downloadingFileId === file.id ? (
+                            <CircularProgress size={16} color="inherit" />
+                          ) : (
+                            <DownloadIcon />
+                          )
+                        }
+                        onClick={() =>
+                          handleDownloadSingleFile(file.id, file.originalName)
+                        }
+                        disabled={downloading || downloadingFileId !== null}
+                        sx={{
+                          backgroundColor: getResourceTypeColor(
+                            contribution.resourceType
+                          ),
+                          flexShrink: 0,
+                          ml: 2,
+                          '&:hover': {
+                            backgroundColor: getResourceTypeColor(
+                              contribution.resourceType
+                            ),
+                            filter: 'brightness(0.9)',
+                          },
+                        }}
+                      >
+                        {downloadingFileId === file.id
+                          ? 'Descargando...'
+                          : 'Descargar'}
+                      </Button>
+                    </Box>
+                  ))}
+                </Stack>
               </Box>
             </>
           )}
@@ -347,6 +526,58 @@ const ContributionDetail: React.FC = () => {
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
             Comentarios ({contribution.comments?.length || 0})
           </Typography>
+
+          {/* Comments List */}
+          <Stack spacing={2}>
+            {contribution.comments && contribution.comments.length > 0 ? (
+              contribution.comments.map((comment: Comment) => (
+                <Card
+                  key={comment.id}
+                  variant="outlined"
+                  sx={{ borderRadius: 2 }}
+                >
+                  <CardContent>
+                    <Stack direction="row" spacing={2}>
+                      <Avatar
+                        sx={{ bgcolor: '#1976d2', width: 40, height: 40 }}
+                      >
+                        {comment.user?.name?.charAt(0).toUpperCase() || 'U'}
+                      </Avatar>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, mb: 0.5 }}
+                        >
+                          {comment.user?.name || 'Usuario'}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mb: 1, display: 'block' }}
+                        >
+                          {formatDate(comment.createdAt)}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          sx={{ mt: 1, lineHeight: 1.6 }}
+                        >
+                          {comment.text}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <Typography variant="body1" color="text.secondary">
+                  No hay comentarios aún. ¡Sé el primero en comentar!
+                </Typography>
+              </Box>
+            )}
+          </Stack>
+
+          <Divider sx={{ my: 3 }} />
 
           {/* Comment Input */}
           <Box component="form" onSubmit={handleCommentSubmit} sx={{ mb: 4 }}>
@@ -364,49 +595,19 @@ const ContributionDetail: React.FC = () => {
               <Button
                 type="submit"
                 variant="contained"
-                endIcon={submittingComment ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
+                endIcon={
+                  submittingComment ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <SendIcon />
+                  )
+                }
                 disabled={!commentText.trim() || submittingComment}
               >
                 {submittingComment ? 'Enviando...' : 'Enviar comentario'}
               </Button>
             </Box>
           </Box>
-
-          <Divider sx={{ my: 3 }} />
-
-          {/* Comments List */}
-          <Stack spacing={2}>
-            {contribution.comments && contribution.comments.length > 0 ? (
-              contribution.comments.map((comment: Comment) => (
-                <Card key={comment.id} variant="outlined" sx={{ borderRadius: 2 }}>
-                  <CardContent>
-                    <Stack direction="row" spacing={2}>
-                      <Avatar sx={{ bgcolor: '#1976d2', width: 40, height: 40 }}>
-                        {comment.user?.name?.charAt(0).toUpperCase() || 'U'}
-                      </Avatar>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                          {comment.user?.name || 'Usuario'}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-                          {formatDate(comment.createdAt)}
-                        </Typography>
-                        <Typography variant="body1" sx={{ mt: 1, lineHeight: 1.6 }}>
-                          {comment.content}
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
-                <Typography variant="body1" color="text.secondary">
-                  No hay comentarios aún. ¡Sé el primero en comentar!
-                </Typography>
-              </Box>
-            )}
-          </Stack>
         </Paper>
       </Container>
 
@@ -416,11 +617,15 @@ const ContributionDetail: React.FC = () => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box >
+    </Box>
   )
 }
 

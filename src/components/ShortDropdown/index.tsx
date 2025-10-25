@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Select, MenuItem, Button, FormControl, InputLabel } from '@mui/material'
+import {
+  Box,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  SelectChangeEvent,
+} from '@mui/material'
 import { Contribution } from '@/types'
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 
 interface SortDropdownProps {
   contributions: Contribution[]
@@ -13,58 +18,50 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
   contributions,
   setContributions,
 }) => {
-  const [sortField, setSortField] = useState<'fecha' | 'valoracion'>('fecha')
-  const [isAsc, setIsAsc] = useState(false)
+  const [sortOption, setSortOption] = useState<string>('fecha-desc')
 
-  // 🔁 Reordena cada vez que cambia el campo o el orden
+  // Reorder whenever the sort option changes
   useEffect(() => {
-    sortContributions(sortField, isAsc)
+    sortContributions(sortOption)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortField, isAsc])
+  }, [sortOption])
 
-  const sortContributions = (field: 'fecha' | 'valoracion', asc: boolean) => {
+  const sortContributions = (option: string) => {
+    const [field, order] = option.split('-')
     const sorted = [...contributions].sort((a, b) => {
       if (field === 'fecha') {
         const dateA = new Date(a.createdAt).getTime()
         const dateB = new Date(b.createdAt).getTime()
-        return asc ? dateA - dateB : dateB - dateA
+        return order === 'asc' ? dateA - dateB : dateB - dateA
       } else {
         const ratingA = a.averageRating ?? 0
         const ratingB = b.averageRating ?? 0
-        return asc ? ratingA - ratingB : ratingB - ratingA
+        return order === 'asc' ? ratingA - ratingB : ratingB - ratingA
       }
     })
     setContributions(sorted)
   }
 
-  const toggleOrder = () => setIsAsc((prev) => !prev)
+  const handleSortChange = (event: SelectChangeEvent) => {
+    setSortOption(event.target.value)
+  }
 
   return (
-    <Box display="flex" alignItems="center" gap={2}>
-      <FormControl size="small" sx={{ minWidth: 160 }}>
-        <InputLabel id="sort-by-label">Ordenar por</InputLabel>
+    <Box>
+      <FormControl size="small" sx={{ minWidth: 220 }}>
+        <InputLabel id="sort-label">Ordenar por</InputLabel>
         <Select
-          labelId="sort-by-label"
-          value={sortField}
+          labelId="sort-label"
+          value={sortOption}
           label="Ordenar por"
-          onChange={(e) =>
-            setSortField(e.target.value as 'fecha' | 'valoracion')
-          }
+          onChange={handleSortChange}
         >
-          <MenuItem value="fecha">Fecha</MenuItem>
-          <MenuItem value="valoracion">Valoración</MenuItem>
+          <MenuItem value="fecha-desc">Más recientes</MenuItem>
+          <MenuItem value="fecha-asc">Más antiguos</MenuItem>
+          <MenuItem value="valoracion-desc">Mayor valoración</MenuItem>
+          <MenuItem value="valoracion-asc">Menor valoración</MenuItem>
         </Select>
       </FormControl>
-
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={toggleOrder}
-        startIcon={isAsc ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-        sx={{ borderRadius: 2, textTransform: 'none' }}
-      >
-        {isAsc ? 'Ascendente' : 'Descendente'}
-      </Button>
     </Box>
   )
 }

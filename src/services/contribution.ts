@@ -54,7 +54,9 @@ export const getContributions = async (): Promise<Contribution[]> => {
   }
 }
 
-export const getContributionById = async (id: number): Promise<Contribution> => {
+export const getContributionById = async (
+  id: number
+): Promise<Contribution> => {
   try {
     const response = await api.get(`/contributions/${id}`)
     return response.data.data
@@ -98,24 +100,6 @@ export const downloadAllFiles = async (
     }
   } catch (error) {
     console.error('Error downloading files:', error)
-    throw error
-  }
-}
-
-export const addComment = async () => {
-  try {
-    // TODO: Implement add comment
-  } catch (error) {
-    console.error('Error adding comment:', error)
-    throw error
-  }
-}
-
-export const rateContribution = async () => {
-  try {
-    // TODO: Implement rate contribution
-  } catch (error) {
-    console.error('Error rating contribution:', error)
     throw error
   }
 }

@@ -194,7 +194,8 @@ const ContributionForm: React.FC = () => {
     } catch (error: any) {
       console.log(error.response.data.message)
       setFileError(
-        error.response.data.message || 'Error al enviar la contribución. Por favor, intenta nuevamente.'
+        error.response.data.message ||
+          'Error al enviar la contribución. Por favor, intenta nuevamente.'
       )
     } finally {
       setIsSubmitting(false)
