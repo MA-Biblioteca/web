@@ -3,17 +3,27 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import './styles/global.css'
-import Layout from './components/Layout'
+
+
+//Páginas
 import Home from './pages/Home'
 import Explore from './pages/Explore'
 // import Upload from './pages/Upload'
-import Moderation from './pages/Login'
+import Login from './pages/Login'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 import ContributionForm from './pages/contribution/ContributionFrom'
 import ContributionDetail from './pages/ContributionDetail'
+
+//Contexts
 import { ResourceProvider } from './contexts/ResourceContext'
 import { ContributionProvider } from './pages/contribution/ContributionContext'
+
+//Layout general de la app
+import Layout from './components/Layout'
+
+//Iconos (renombrados para evitar conflictos)
+import { Login as LoginIcon } from '@mui/icons-material'
 
 const theme = createTheme({
   palette: {
@@ -33,8 +43,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
+          {/* Página inicial: Login */}
+          <Route index element={<Login />} />
+          <Route path="/" element={<Layout />}> 
+            {/* Otras páginas */}
+            <Route path="home" element={<Home />} />
             <Route path="explore" element={<Explore />} />
             <Route path="contributions/:id" element={<ContributionDetail />} />
             <Route
@@ -45,7 +58,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 </ContributionProvider>
               }
             />
-            <Route path="moderation" element={<Moderation />} />
+            <Route path="Login" element={<Login />} />
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Route>

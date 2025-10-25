@@ -3,6 +3,10 @@ import React, { useState } from 'react'
 import { Box, TextField, Button, Typography, Paper } from '@mui/material'
 // Estilos globales compartidos
 import { pageBoxContainerStyle } from '@/styles/global'
+// Hook para navegación programática
+import { useNavigate } from 'react-router-dom'
+// Icono opcional para login
+import LoginIcon from '@mui/icons-material/Login'
 
 // Componente funcional de login
 const Login: React.FC = () => {
@@ -14,6 +18,11 @@ const Login: React.FC = () => {
 
   const [usernameError, setUsernameError] = useState('') // mensaje de error para usuario
   const [passwordError, setPasswordError] = useState('') // mensaje de error para contraseña
+
+  // ---------------------------
+  // Hook de navegación
+  // ---------------------------
+  const navigate = useNavigate() // nos permite redirigir a otra ruta
 
   // ---------------------------
   // Función que se ejecuta al enviar el formulario
@@ -46,16 +55,43 @@ const Login: React.FC = () => {
     console.log('Contraseña:', password)
 
     // Aquí iría la lógica para enviar los datos al backend
+
+    // ---------------------------
+    // Redirigir a Home después del login
+    // ---------------------------
+    navigate('/home')
   }
 
   return (
-    // Contenedor principal centrado
-    <Box sx={pageBoxContainerStyle}>
-      
+    // Contenedor principal centrado con fondo
+    <Box
+      sx={{
+        minHeight: '100vh', // altura total de la pantalla
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column',
+        gap: 2,
+        background: 'linear-gradient(135deg, #f0f4ff, #d9e4ff)', // degradado
+      }}
+    >
+      {/* Icono grande de login */}
+      <LoginIcon sx={{ fontSize: 50, color: '#1976d2', mb: 2 }} />
+
+      {/* Título y subtítulo */}
+      <Box sx={{ textAlign: 'center', mb: 2 }}>
+        <Typography variant="h4" fontWeight="bold">
+          MA Biblioteca
+        </Typography>
+        <Typography variant="subtitle1" color="textSecondary">
+          Ingresa para continuar
+        </Typography>
+      </Box>
+
       {/* Tarjeta de login */}
       <Paper
         elevation={3} // sombra
-        sx={{ padding: 4, minWidth: 300 }}
+        sx={{ padding: 4, minWidth: 300, borderRadius: 3 }}
       >
         {/* Título */}
         <Typography variant="h5" component="h1" sx={{ mb: 2 }}>
@@ -95,6 +131,11 @@ const Login: React.FC = () => {
           <Button variant="contained" color="primary" type="submit">
             Ingresar
           </Button>
+
+          {/* Links opcionales */}
+          <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
+            <a href="/register">Registrarse</a> | <a href="/forgot-password">Olvidé mi contraseña</a>
+          </Typography>
         </Box>
       </Paper>
     </Box>
