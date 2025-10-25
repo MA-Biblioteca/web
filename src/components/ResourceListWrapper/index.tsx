@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { Box, CircularProgress, Typography, Container, Grid } from '@mui/material'
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Container,
+  Grid,
+} from '@mui/material'
 import { getContributions } from '@/services/contribution'
+import { getRatingsByContribution } from '@/services/ratings'
 import { Contribution } from '@/types'
 import SortDropdown from '../ShortDropdown/index'
 import ResourceCard from '../ResourceList/ResourceCard'
@@ -15,7 +22,33 @@ const ResourceListWrapper: React.FC = () => {
       try {
         setLoading(true)
         const data = await getContributions()
-        setContributions(data)
+
+        // Fetch ratings for all contributions
+        const contributionsWithRatings = await Promise.all(
+          data.map(async (contribution) => {
+            try {
+              const { avgRating, ratingsCount } =
+                await getRatingsByContribution(contribution.id)
+              return {
+                ...contribution,
+                averageRating: avgRating ?? 0,
+                totalRatings: ratingsCount ?? 0,
+              }
+            } catch (error) {
+              console.error(
+                `Error fetching ratings for contribution ${contribution.id}:`,
+                error
+              )
+              return {
+                ...contribution,
+                averageRating: 0,
+                totalRatings: 0,
+              }
+            }
+          })
+        )
+
+        setContributions(contributionsWithRatings)
         setError(null)
       } catch (err) {
         console.error('Error loading contributions:', err)
@@ -74,7 +107,8 @@ const ResourceListWrapper: React.FC = () => {
             Recursos Académicos
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Explora y descarga materiales de estudio compartidos por la comunidad
+            Explora y descarga materiales de estudio compartidos por la
+            comunidad
           </Typography>
         </Box>
 

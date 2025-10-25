@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Card,
@@ -12,7 +12,6 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
-  CardActionArea,
 } from '@mui/material'
 import {
   Description as DescriptionIcon,
@@ -23,8 +22,10 @@ import {
 } from '@mui/icons-material'
 import { Contribution } from '@/types'
 import { downloadAllFiles } from '@/services/contribution'
+import { getRatingsByContribution } from '@/services/ratings'
 import { Visibility } from '@mui/icons-material'
 import { iconSx } from '@/styles/global'
+import StarRating from '@/components/StarRating'
 
 interface ResourceCardProps {
   contribution: Contribution
@@ -33,6 +34,8 @@ interface ResourceCardProps {
 const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
   const navigate = useNavigate()
   const [downloading, setDownloading] = useState(false)
+  const [avgRating, setAvgRating] = useState<number>(0)
+  const [totalRatings, setTotalRatings] = useState<number>(0)
   const [snackbar, setSnackbar] = useState<{
     open: boolean
     message: string
@@ -42,6 +45,34 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
     message: '',
     severity: 'success',
   })
+
+  useEffect(() => {
+    const fetchRatings = async () => {
+      // Skip if ratings are already provided in the contribution
+      if (
+        contribution.averageRating !== undefined &&
+        contribution.totalRatings !== undefined
+      ) {
+        setAvgRating(contribution.averageRating)
+        setTotalRatings(contribution.totalRatings)
+        return
+      }
+
+      // Otherwise fetch them
+      try {
+        const { avgRating, ratingsCount } = await getRatingsByContribution(
+          contribution.id
+        )
+        setAvgRating(avgRating ?? 0)
+        setTotalRatings(ratingsCount ?? 0)
+      } catch (error) {
+        console.error('Error fetching ratings:', error)
+        // Silently fail - ratings are not critical for card display
+      }
+    }
+
+    fetchRatings()
+  }, [contribution.id, contribution.averageRating, contribution.totalRatings])
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation() // Prevent card click
@@ -58,7 +89,8 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
     } catch (error) {
       setSnackbar({
         open: true,
-        message: 'Error al descargar los archivos. Por favor, intenta nuevamente.',
+        message:
+          'Error al descargar los archivos. Por favor, intenta nuevamente.',
         severity: 'error',
       })
     } finally {
@@ -95,7 +127,6 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
 
   return (
     <Card
-      onClick={handleCardClick}
       sx={{
         height: '100%',
         display: 'flex',
@@ -120,173 +151,226 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
         }}
       />
 
-      <CardActionArea onClick={handleCardClick} sx={{ flexGrow: 1 }}>
-        <CardContent sx={{ p: 3 }}>
-          {/* Header with title and resource type chip */}
-          <Box sx={{ mb: 2 }}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="flex-start"
-              spacing={2}
-              sx={{ mb: 1.5 }}
-            >
-              <Typography
-                variant="h6"
-                component="h3"
-                sx={{
-                  fontWeight: 600,
-                  fontSize: '1.25rem',
-                  color: '#1a1a1a',
-                  lineHeight: 1.3,
-                  flex: 1,
-                }}
-              >
-                {contribution.title}
-              </Typography>
-              <Chip
-                label={contribution.resourceType}
-                size="small"
-                sx={{
-                  backgroundColor: getResourceTypeColor(contribution.resourceType),
-                  color: 'white',
-                  fontWeight: 600,
-                  fontSize: '0.75rem',
-                  textTransform: 'capitalize',
-                }}
-              />
-            </Stack>
-
+      <CardContent onClick={handleCardClick} sx={{ p: 3, flexGrow: 1 }}>
+        {/* Header with title and resource type chip */}
+        <Box sx={{ mb: 2 }}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+            spacing={2}
+            sx={{ mb: 1.5 }}
+          >
             <Typography
-              variant="body2"
-              color="text.secondary"
+              variant="h6"
+              component="h3"
               sx={{
-                mb: 2,
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                lineHeight: 1.6,
+                fontWeight: 600,
+                fontSize: '1.25rem',
+                color: '#1a1a1a',
+                lineHeight: 1.3,
+                flex: 1,
               }}
             >
-              {contribution.description}
+              {contribution.title}
             </Typography>
-          </Box>
-
-          {/* Career and Subject */}
-          <Box sx={{ mb: 2 }}>
-            <Stack spacing={1}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <SchoolIcon sx={iconSx} />
-                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
-                  {contribution.careerSubject.career.name}
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <DescriptionIcon sx={iconSx} />
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 500,
-                    color: '#333',
-                    fontSize: '0.875rem',
-                  }}
-                >
-                  {contribution.careerSubject.subject.name}
-                </Typography>
-              </Box>
-            </Stack>
-          </Box>
-
-          {/* Year and Date */}
-          <Box sx={{ mb: 2 }}>
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <CalendarIcon sx={iconSx} />
-                <Typography variant="caption" color="text.secondary">
-                  Año {contribution.year}
-                </Typography>
-              </Box>
-              <Typography variant="caption" color="text.secondary">
-                •
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {formatDate(contribution.createdAt)}
-              </Typography>
-            </Stack>
-          </Box>
-
-          {/* Files section */}
-          {contribution.files.length > 0 && (
-            <Box
+            <Chip
+              label={contribution.resourceType}
+              size="small"
               sx={{
-                mt: 'auto',
-                pt: 2,
-                borderTop: '1px solid #f0f0f0',
+                backgroundColor: getResourceTypeColor(
+                  contribution.resourceType
+                ),
+                color: 'white',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                textTransform: 'capitalize',
               }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <AttachFileIcon sx={iconSx} />
-                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
-                    {contribution.files.length} {contribution.files.length === 1 ? 'archivo' : 'archivos'}
-                  </Typography>
-                </Box>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <Tooltip title="Visualizaciones totales">
-                    <span style={{ ...iconSx, fontSize: '.8rem', position: 'relative', top: '.3rem' }}>
-                      {contribution.views} <Visibility sx={{ ...iconSx, verticalAlign: 'middle' }} />
-                    </span>
-                  </Tooltip>
-                  <Tooltip title={downloading ? 'Descargando...' : 'Descargar archivos'}>
-                    <span>
-                      <IconButton
-                        size="small"
-                        onClick={handleDownload}
-                        disabled={downloading}
-                        sx={{
-                          color: getResourceTypeColor(contribution.resourceType),
-                          '&:hover': {
-                            backgroundColor: `${getResourceTypeColor(contribution.resourceType)}15`,
-                          },
-                          '&.Mui-disabled': {
-                            color: '#ccc',
-                          },
-                        }}
-                      >
-                        {downloading ? (
-                          <CircularProgress size={20} />
-                        ) : (
-                          <DownloadIcon fontSize="small" />
-                        )}
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                </div>
-              </Box>
-            </Box>
-          )}
+            />
+          </Stack>
 
-          {contribution.files.length === 0 && (
-            <Box
-              sx={{
-                mt: 'auto',
-                pt: 2,
-                borderTop: '1px solid #f0f0f0',
-              }}
-            >
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              mb: 2,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              lineHeight: 1.6,
+            }}
+          >
+            {contribution.description}
+          </Typography>
+        </Box>
+
+        {/* Rating */}
+        <Box sx={{ mb: 2 }}>
+          {totalRatings > 0 ? (
+            <StarRating
+              value={avgRating || 0}
+              readOnly
+              totalRatings={totalRatings}
+              size="small"
+            />
+          ) : (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <StarRating value={0} readOnly size="small" />
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 1 }}
+                sx={{ fontStyle: 'italic', ml: -1 }}
               >
-                <AttachFileIcon sx={{ fontSize: 16 }} />
-                Sin archivos adjuntos
+                Sin calificaciones
               </Typography>
             </Box>
           )}
-        </CardContent>
-      </CardActionArea>
+        </Box>
+
+        {/* Career and Subject */}
+        <Box sx={{ mb: 2 }}>
+          <Stack spacing={1}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <SchoolIcon sx={iconSx} />
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontSize: '0.875rem' }}
+              >
+                {contribution.careerSubject.career.name}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <DescriptionIcon sx={iconSx} />
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 500,
+                  color: '#333',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {contribution.careerSubject.subject.name}
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
+
+        {/* Year and Date */}
+        <Box sx={{ mb: 2 }}>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <CalendarIcon sx={iconSx} />
+              <Typography variant="caption" color="text.secondary">
+                Año {contribution.year}
+              </Typography>
+            </Box>
+            <Typography variant="caption" color="text.secondary">
+              •
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {formatDate(contribution.createdAt)}
+            </Typography>
+          </Stack>
+        </Box>
+
+        {/* Files section */}
+        {contribution.files.length > 0 && (
+          <Box
+            sx={{
+              mt: 'auto',
+              pt: 2,
+              borderTop: '1px solid #f0f0f0',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <AttachFileIcon sx={iconSx} />
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ fontSize: '0.875rem' }}
+                >
+                  {contribution.files.length}{' '}
+                  {contribution.files.length === 1 ? 'archivo' : 'archivos'}
+                </Typography>
+              </Box>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <Tooltip title="Visualizaciones totales">
+                  <span
+                    style={{
+                      ...iconSx,
+                      fontSize: '.8rem',
+                      position: 'relative',
+                      top: '.3rem',
+                    }}
+                  >
+                    {contribution.views}{' '}
+                    <Visibility sx={{ ...iconSx, verticalAlign: 'middle' }} />
+                  </span>
+                </Tooltip>
+                <Tooltip
+                  title={downloading ? 'Descargando...' : 'Descargar archivos'}
+                >
+                  <span>
+                    <IconButton
+                      size="small"
+                      onClick={handleDownload}
+                      disabled={downloading}
+                      sx={{
+                        color: getResourceTypeColor(contribution.resourceType),
+                        '&:hover': {
+                          backgroundColor: `${getResourceTypeColor(contribution.resourceType)}15`,
+                        },
+                        '&.Mui-disabled': {
+                          color: '#ccc',
+                        },
+                      }}
+                    >
+                      {downloading ? (
+                        <CircularProgress size={20} />
+                      ) : (
+                        <DownloadIcon fontSize="small" />
+                      )}
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </div>
+            </Box>
+          </Box>
+        )}
+
+        {contribution.files.length === 0 && (
+          <Box
+            sx={{
+              mt: 'auto',
+              pt: 2,
+              borderTop: '1px solid #f0f0f0',
+            }}
+          >
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{
+                fontStyle: 'italic',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <AttachFileIcon sx={{ fontSize: 16 }} />
+              Sin archivos adjuntos
+            </Typography>
+          </Box>
+        )}
+      </CardContent>
 
       <Snackbar
         open={snackbar.open}
@@ -294,7 +378,11 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
@@ -303,4 +391,3 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
 }
 
 export default ResourceCard
-
