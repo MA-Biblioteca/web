@@ -7,7 +7,8 @@ import Layout from './components/Layout'
 import Home from './pages/Home'
 import Explore from './pages/Explore'
 // import Upload from './pages/Upload'
-import Moderation from './pages/Moderation'
+import Login from './pages/Login'
+import RegisterPage from './pages/Register'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 import ContributionForm from './pages/contribution/ContributionFrom'
@@ -33,8 +34,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
+          {/* Página inicial: Login */}
+          <Route index element={<Login />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+          <Route path="/" element={<Layout />}> 
+            {/* Otras páginas */}
+            <Route path="home" element={<Home />} />
             <Route path="explore" element={<Explore />} />
             <Route path="contributions/:id" element={<ContributionDetail />} />
             <Route
@@ -45,7 +51,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 </ContributionProvider>
               }
             />
-            <Route path="moderation" element={<Moderation />} />
+             <Route path="Login" element={<Login />} />
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Route>
