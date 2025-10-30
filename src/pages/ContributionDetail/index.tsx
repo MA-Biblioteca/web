@@ -42,8 +42,8 @@ import {
   downloadAllFiles,
   updateContribution,
 } from '@/services/contribution'
-import { getCareers } from '@/services/career' // ← Corregido
-import { getSubjects } from '@/services/subject' // ← Corregido
+import { getCareers } from '@/services/career'
+import { getSubjects } from '@/services/subject'
 import { getRatingsByContribution, createRating } from '@/services/ratings'
 import { addComment } from '@/services/comments'
 import { Contribution, Comment } from '@/types'
@@ -475,7 +475,7 @@ const ContributionDetail: React.FC = () => {
           {isEditing ? (
             <Grid container spacing={2} sx={{ mb: 3 }}>
               {/* Carrera */}
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid item xs={12} md={6}>
                 <FormControl fullWidth>
                   <InputLabel id="carrera-label">
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -502,7 +502,7 @@ const ContributionDetail: React.FC = () => {
               </Grid>
 
               {/* Materia */}
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid item xs={12} md={6}>
                 <FormControl fullWidth>
                   <InputLabel id="materia-label">
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
