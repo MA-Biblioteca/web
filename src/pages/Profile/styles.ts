@@ -1,7 +1,7 @@
 import { SxProps, Theme } from '@mui/material'
 
 export const profileHeaderPaperSx: SxProps<Theme> = {
-  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  background: 'linear-gradient(170deg, #2020ffff 0%, #3483d2ff 20%, #6a76a5ff 50%, #3b0dc3ff 100%)',
   color: 'white',
   borderRadius: 0,
   position: 'relative',
@@ -13,7 +13,7 @@ export const profileHeaderPaperSx: SxProps<Theme> = {
     left: 0,
     right: 0,
     bottom: 0,
-    background: 'radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+    background: 'radial-gradient(circle at 30% 50%, rgba(76, 18, 222, 0.1) 0%, transparent 50%)',
   },
 }
 
