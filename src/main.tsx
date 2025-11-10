@@ -1,4 +1,4 @@
-import React from 'react'
+/* eslint-disable react/react-in-jsx-scope */
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
@@ -10,6 +10,7 @@ import Home from './pages/Home'
 import Explore from './pages/Explore'
 // import Upload from './pages/Upload'
 import Login from './pages/Login'
+import RegisterPage from './pages/Register'
 import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 import ContributionForm from './pages/contribution/ContributionFrom'
@@ -40,6 +41,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Routes>
           {/* Página inicial: Login */}
           <Route index element={<Login />} />
+          <Route path="/register" element={<RegisterPage />} />
+
           <Route path="/" element={<Layout />}>
             {/* Otras páginas */}
             <Route path="home" element={<Home />} />
@@ -53,7 +56,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 </ContributionProvider>
               }
             />
-            <Route path="Login" element={<Login />} />
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Route>

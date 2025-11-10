@@ -1,8 +1,8 @@
 import React from 'react'
 import { Box } from '@mui/material'
-import Login from '@/components/auth/Login'
+import Register from '@/components/auth/Register'
 
-const LoginPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
   return (
     <Box
       sx={{
@@ -13,9 +13,9 @@ const LoginPage: React.FC = () => {
         backgroundColor: '#f8f9fa',
       }}
     >
-      <Login />
+      <Register />
     </Box>
   )
 }
 
-export default LoginPage
+export default RegisterPage
