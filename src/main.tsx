@@ -1,9 +1,9 @@
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import './styles/global.css'
-
 
 //Páginas
 import Home from './pages/Home'
@@ -15,15 +15,10 @@ import NotFound from './pages/NotFound'
 import ContributionForm from './pages/contribution/ContributionFrom'
 import ContributionDetail from './pages/ContributionDetail'
 
-//Contexts
 import { ResourceProvider } from './contexts/ResourceContext'
 import { ContributionProvider } from './pages/contribution/ContributionContext'
 
-//Layout general de la app
 import Layout from './components/Layout'
-
-//Iconos (renombrados para evitar conflictos)
-import { Login as LoginIcon } from '@mui/icons-material'
 
 const theme = createTheme({
   palette: {
@@ -45,7 +40,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Routes>
           {/* Página inicial: Login */}
           <Route index element={<Login />} />
-          <Route path="/" element={<Layout />}> 
+          <Route path="/" element={<Layout />}>
             {/* Otras páginas */}
             <Route path="home" element={<Home />} />
             <Route path="explore" element={<Explore />} />
