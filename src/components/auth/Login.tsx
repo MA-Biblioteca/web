@@ -6,21 +6,20 @@ import {
   TextField,
   Button,
   CircularProgress,
-  IconButton, 
-  InputAdornment, 
+  IconButton,
+  InputAdornment,
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import LoginIcon from '@mui/icons-material/Login'
-import Visibility from '@mui/icons-material/Visibility' 
-import VisibilityOff from '@mui/icons-material/VisibilityOff' 
-import { useFormik } from 'formik' 
-import * as Yup from 'yup' 
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 
 const Login: React.FC = () => {
   const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState(false) 
+  const [showPassword, setShowPassword] = useState(false)
 
-  
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -73,26 +72,25 @@ const Login: React.FC = () => {
           </Typography>
         </Box>
 
-        
         <form onSubmit={formik.handleSubmit}>
           <TextField
             label="Correo electrónico"
             fullWidth
             margin="normal"
-            {...formik.getFieldProps('email')} 
-            error={formik.touched.email && Boolean(formik.errors.email)} 
-            helperText={formik.touched.email && formik.errors.email} 
+            {...formik.getFieldProps('email')}
+            error={formik.touched.email && Boolean(formik.errors.email)}
+            helperText={formik.touched.email && formik.errors.email}
           />
           <TextField
             label="Contraseña"
-            type={showPassword ? 'text' : 'password'} 
+            type={showPassword ? 'text' : 'password'}
             fullWidth
             margin="normal"
-            {...formik.getFieldProps('password')} 
-            error={formik.touched.password && Boolean(formik.errors.password)} 
+            {...formik.getFieldProps('password')}
+            error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
             InputProps={{
-              endAdornment: ( 
+              endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
                     onClick={() => setShowPassword(!showPassword)}
@@ -109,10 +107,10 @@ const Login: React.FC = () => {
             variant="contained"
             size="large"
             fullWidth
-            disabled={formik.isSubmitting} 
+            disabled={formik.isSubmitting}
             sx={{ mt: 2 }}
             startIcon={
-              formik.isSubmitting ? ( 
+              formik.isSubmitting ? (
                 <CircularProgress size={18} color="inherit" />
               ) : null
             }

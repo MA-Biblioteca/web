@@ -6,11 +6,11 @@ const LoginPage: React.FC = () => {
   return (
     <Box
       sx={{
-        height: '100vh', 
+        height: '100vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f8f9fa', 
+        backgroundColor: '#f8f9fa',
       }}
     >
       <Login />
@@ -19,4 +19,3 @@ const LoginPage: React.FC = () => {
 }
 
 export default LoginPage
-
