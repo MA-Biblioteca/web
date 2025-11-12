@@ -13,20 +13,16 @@ import {
   Person,
   Email,
   CalendarToday,
-  School,
 } from '@mui/icons-material'
 import { mockUserProfile } from '@/__mocks__/profileMock'
 import { UserProfile } from '@/services/user'
 import { Contribution } from '@/types'
 import ResourceCard from '@/components/ResourceList/ResourceCard'
-import { getCareers } from '@/services/career'
 import { getContributions } from '@/services/contribution'
 import {
   profileHeaderPaperSx,
   profileAvatarSx,
   profileNameSx,
-  profileCareerBoxSx,
-  profileCareerTextSx,
   profileInfoContainerSx,
   profileInfoItemSx,
   profileInfoIconSx,
@@ -35,21 +31,14 @@ import {
   emptyStatePaperSx,
 } from './styles'
 
-interface Career {
-  id: number
-  name: string
-}
-
 const Profile: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [contributions, setContributions] = useState<Contribution[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [careers, setCareers] = useState<Career[]>([])
 
   useEffect(() => {
     loadProfileData()
-    loadCareers()
   }, [])
 
   const loadProfileData = async () => {
@@ -62,6 +51,7 @@ const Profile: React.FC = () => {
         const userContributions = await getContributions(userId)
         setContributions(userContributions)
       } else {
+        // TO DO: Eliminar este fallback cuando el login/registro esté funcional 100%
         const allContributions = await getContributions()
         setContributions(allContributions)
       }
@@ -70,19 +60,6 @@ const Profile: React.FC = () => {
       setContributions([])
     } finally {
       setLoading(false)
-    }
-  }
-
-  const loadCareers = async () => {
-    try {
-      const response = await getCareers()
-      setCareers(response || [])
-    } catch (err) {
-      setCareers([
-        { id: 1, name: 'Ingeniería en Sistemas de información' },
-        { id: 2, name: 'Ingeniería Industrial' },
-        { id: 3, name: 'Ingeniería Civil' },
-      ])
     }
   }
 
@@ -104,9 +81,6 @@ const Profile: React.FC = () => {
 
   const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'Usuario'
   const initials = fullName.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2)
-  const careerName = profile.careerId && careers.length > 0
-    ? careers.find((c) => c.id === profile.careerId)?.name
-    : null
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f8f9fa' }}>
@@ -122,15 +96,6 @@ const Profile: React.FC = () => {
                 <Typography variant="h3" sx={profileNameSx}>
                   {fullName}
                 </Typography>
-
-                {careerName && (
-                  <Box sx={profileCareerBoxSx}>
-                    <School sx={{ fontSize: 20 }} />
-                    <Typography variant="h6" sx={profileCareerTextSx}>
-                      {careerName}
-                    </Typography>
-                  </Box>
-                )}
 
                 <Box sx={profileInfoContainerSx}>
                   {profile.email && (

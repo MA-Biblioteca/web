@@ -33,17 +33,6 @@ export const profileNameSx: SxProps<Theme> = {
   mb: 0.5,
 }
 
-export const profileCareerBoxSx: SxProps<Theme> = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 1,
-  mb: 1,
-}
-
-export const profileCareerTextSx: SxProps<Theme> = {
-  opacity: 0.9,
-}
-
 export const profileInfoContainerSx: SxProps<Theme> = {
   display: 'flex',
   gap: 3,
