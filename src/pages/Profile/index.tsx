@@ -10,7 +10,6 @@ import {
   Container,
 } from '@mui/material'
 import {
-  Person,
   Email,
   CalendarToday,
 } from '@mui/icons-material'
@@ -107,15 +106,6 @@ const Profile: React.FC = () => {
                     </Box>
                   )}
 
-                  {profile.identificationNumber && (
-                    <Box sx={profileInfoItemSx}>
-                      <Person sx={profileInfoIconSx} />
-                      <Typography variant="body2" sx={profileInfoTextSx}>
-                        DNI: {profile.identificationNumber}
-                      </Typography>
-                    </Box>
-                  )}
-
                   <Box sx={profileInfoItemSx}>
                     <CalendarToday sx={profileInfoIconSx} />
                     <Typography variant="body2" sx={profileInfoTextSx}>
@@ -131,7 +121,7 @@ const Profile: React.FC = () => {
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Typography variant="h5" sx={contributionsTitleSx}>
-          Mis Aportes
+          {`Mis Aportes (${contributions.length})`}
         </Typography>
 
         {contributions.length === 0 ? (

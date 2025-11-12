@@ -8,6 +8,6 @@ export const mockUserProfile: UserProfile = {
   identificationNumber: 12345678,
   phone: '2217773333',
   careerId: 1,
-  createdAt: '2025-06-15T10:30:00.000Z',
+  createdAt: '2025-09-15T10:30:00.000Z',
   contributionsCount: 1
 }
