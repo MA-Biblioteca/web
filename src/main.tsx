@@ -1,6 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import './styles/global.css'
@@ -39,26 +39,36 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Routes>
-          {/* Página inicial: Login */}
-          <Route index element={<Login />} />
-          <Route path="/register" element={<RegisterPage />} />
-
-          <Route path="/" element={<Layout />}>
-            {/* Otras páginas */}
-            <Route path="home" element={<Home />} />
-            <Route path="explore" element={<Explore />} />
-            <Route path="contributions/:id" element={<ContributionDetail />} />
-            <Route
-              path="upload"
-              element={
-                <ContributionProvider>
-                  <ContributionForm />
-                </ContributionProvider>
-              }
-            />
-            <Route path="profile" element={<Profile />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
+          {localStorage.getItem('token') ? (
+            <>
+              <Route path="/login" element={<Navigate to="/" replace />} />
+              <Route path="/register" element={<Navigate to="/" replace />} />
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="explore" element={<Explore />} />
+                <Route
+                  path="contributions/:id"
+                  element={<ContributionDetail />}
+                />
+                <Route
+                  path="upload"
+                  element={
+                    <ContributionProvider>
+                      <ContributionForm />
+                    </ContributionProvider>
+                  }
+                />
+                <Route path="profile" element={<Profile />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </>
+          ) : (
+            <>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </>
+          )}
         </Routes>
       </ThemeProvider>
     </BrowserRouter>

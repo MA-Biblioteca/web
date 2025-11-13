@@ -33,7 +33,9 @@ export interface Comment {
   updatedAt: string
   user?: {
     id: number
-    name: string
+    firstName?: string
+    lastName?: string
+    email: string
   }
 }
 
@@ -51,7 +53,10 @@ export interface Contribution {
   title: string
   description: string
   year: number
-  resourceType: string
+  resourceType: {
+    id: number
+    name: string
+  }
   views: number
   careerSubjectId: number
   createdAt: string
@@ -64,4 +69,24 @@ export interface Contribution {
   averageRating?: number
   totalRatings?: number
   userRating?: number
+}
+
+export interface UpdateUser {
+  firstName?: string
+  lastName?: string
+  identificationNumber?: string
+  street_number?: string
+  address?: string
+  route?: string
+  locality?: string
+  administrative_area_level_2?: string
+  administrative_area_level_1?: string
+  phone?: string
+  roleId?: string
+  secondaryPhone?: string
+}
+
+export interface CreateUser {
+  email: string
+  password: string
 }

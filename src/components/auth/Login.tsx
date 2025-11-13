@@ -15,6 +15,7 @@ import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { login } from '@/services/auth'
 
 const Login: React.FC = () => {
   const navigate = useNavigate()
@@ -33,11 +34,15 @@ const Login: React.FC = () => {
     }),
     onSubmit: async (values, { setSubmitting }) => {
       setSubmitting(true)
-      console.log('Datos de login:', values)
-      setTimeout(() => {
+      try {
+        const { token } = await login(values.email, values.password)
+        localStorage.setItem('token', token)
+        navigate('/')
         setSubmitting(false)
-        navigate('/home')
-      }, 1200)
+      } catch (error) {
+        console.error('Error de login:', error)
+        setSubmitting(false)
+      }
     },
   })
 
