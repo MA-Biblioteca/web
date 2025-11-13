@@ -1,5 +1,5 @@
 import api from './api'
-
+import { CreateUser } from '@/types'
 export interface UserProfile {
   id: number
   firstName?: string
@@ -25,6 +25,17 @@ export const getUserProfile = async (userId: number): Promise<UserProfile> => {
     const response = await api.get(`/users/${userId}`)
     return response.data.data
   } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const getUser = async (userId: string) => {
+  try {
+    const response = await api.get(`/users/${userId}`)
+    return response.data
+  } catch (error) {
+    console.error(error)
     throw error
   }
 }
@@ -37,6 +48,7 @@ export const updateUserProfile = async (
     const response = await api.patch(`/users/${userId}`, data)
     return response.data.data
   } catch (error) {
+    console.error(error)
     throw error
   }
 }
@@ -48,5 +60,15 @@ export const getUserContributions = async (userId: number) => {
     return allContributions.filter((c: any) => c.userId === userId)
   } catch (error) {
     return []
+  }
+}
+
+export const createUser = async (user: CreateUser) => {
+  try {
+    const response = await api.post('/users', user)
+    return response.data
+  } catch (error) {
+    console.error(error)
+    throw error
   }
 }

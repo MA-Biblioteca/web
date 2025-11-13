@@ -6,24 +6,24 @@ import {
   TextField,
   Button,
   CircularProgress,
-  IconButton, 
-  InputAdornment, 
+  IconButton,
+  InputAdornment,
   Snackbar,
-  Alert, 
+  Alert,
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
-import Visibility from '@mui/icons-material/Visibility' 
-import VisibilityOff from '@mui/icons-material/VisibilityOff' 
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import { useFormik } from 'formik'
-import * as Yup from 'yup' 
+import * as Yup from 'yup'
+import { createUser } from '@/services/user'
 
 const Register: React.FC = () => {
   const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState(false) 
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false) 
-  const [success, setSuccess] = useState(false) 
-
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   const formik = useFormik({
     initialValues: {
@@ -44,12 +44,15 @@ const Register: React.FC = () => {
     }),
     onSubmit: async (values, { setSubmitting }) => {
       setSubmitting(true)
-      console.log('Datos de registro:', values)
-      setTimeout(() => {
-        setSubmitting(false)
+      try {
+        await createUser(values)
         setSuccess(true)
-        setTimeout(() => navigate('/login'), 1800)
-      }, 1200)
+        setTimeout(() => {
+          navigate('/login')
+        }, 2000)
+      } catch (error) {
+        console.error('Error de registro:', error)
+      }
     },
   })
 
@@ -89,13 +92,13 @@ const Register: React.FC = () => {
             label="Correo electrónico"
             fullWidth
             margin="normal"
-            {...formik.getFieldProps('email')} 
-            error={formik.touched.email && Boolean(formik.errors.email)} 
-            helperText={formik.touched.email && formik.errors.email} 
+            {...formik.getFieldProps('email')}
+            error={formik.touched.email && Boolean(formik.errors.email)}
+            helperText={formik.touched.email && formik.errors.email}
           />
           <TextField
             label="Contraseña"
-            type={showPassword ? 'text' : 'password'} 
+            type={showPassword ? 'text' : 'password'}
             fullWidth
             margin="normal"
             {...formik.getFieldProps('password')}
@@ -131,16 +134,10 @@ const Register: React.FC = () => {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
-                    onClick={() =>
-                      setShowConfirmPassword(!showConfirmPassword)
-                    }
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     edge="end"
                   >
-                    {showConfirmPassword ? (
-                      <Visibility />
-                    ) : (
-                      <VisibilityOff />
-                    )}
+                    {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -152,7 +149,7 @@ const Register: React.FC = () => {
             variant="contained"
             size="large"
             fullWidth
-            disabled={formik.isSubmitting} 
+            disabled={formik.isSubmitting}
             sx={{ mt: 2 }}
             startIcon={
               formik.isSubmitting ? (
@@ -179,7 +176,7 @@ const Register: React.FC = () => {
           </Typography>
         </form>
       </Paper>
-      
+
       <Snackbar
         open={success}
         autoHideDuration={2000}
@@ -200,4 +197,3 @@ const Register: React.FC = () => {
 }
 
 export default Register
-

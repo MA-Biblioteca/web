@@ -5,7 +5,7 @@ export interface CreateContributionData {
   careerId: number
   subjectId: number
   year: number
-  resourceType: string
+  resourceTypeId: string
   title: string
   description: string
   files: File[]
@@ -19,7 +19,7 @@ export const createContribution = async (data: CreateContributionData) => {
     formData.append('careerId', data.careerId.toString())
     formData.append('subjectId', data.subjectId.toString())
     formData.append('year', data.year.toString())
-    formData.append('resourceType', data.resourceType)
+    formData.append('resourceTypeId', data.resourceTypeId)
     formData.append('title', data.title)
     formData.append('description', data.description)
 
