@@ -1,5 +1,34 @@
-import { CreateUser, UpdateUser } from '@/types'
 import api from './api'
+import { CreateUser } from '@/types'
+export interface UserProfile {
+  id: number
+  firstName?: string
+  lastName?: string
+  email: string
+  identificationNumber?: number
+  phone?: string
+  careerId?: number
+  careerName?: string
+  createdAt: string
+  contributionsCount?: number
+}
+
+export interface UpdateUserProfileData {
+  firstName?: string
+  lastName?: string
+  phone?: string
+  careerId?: number
+}
+
+export const getUserProfile = async (userId: number): Promise<UserProfile> => {
+  try {
+    const response = await api.get(`/users/${userId}`)
+    return response.data.data
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
 
 export const getUser = async (userId: string) => {
   try {
@@ -11,13 +40,26 @@ export const getUser = async (userId: string) => {
   }
 }
 
-export const updateUser = async (userId: string, user: UpdateUser) => {
+export const updateUserProfile = async (
+  userId: number,
+  data: UpdateUserProfileData
+): Promise<UserProfile> => {
   try {
-    const response = await api.put(`/users/${userId}`, user)
-    return response.data
+    const response = await api.patch(`/users/${userId}`, data)
+    return response.data.data
   } catch (error) {
     console.error(error)
     throw error
+  }
+}
+
+export const getUserContributions = async (userId: number) => {
+  try {
+    const response = await api.get('/contributions')
+    const allContributions = response.data?.data || []
+    return allContributions.filter((c: any) => c.userId === userId)
+  } catch (error) {
+    return []
   }
 }
 
