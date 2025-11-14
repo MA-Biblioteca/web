@@ -23,42 +23,44 @@ const ResourceListWrapper: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState<ContributionFilters>({})
 
-  const fetchContributions = useCallback(async (activeFilters: ContributionFilters) => {
-    try {
-      setLoading(true)
-      const data = await getContributions(activeFilters)
+  const fetchContributions = useCallback(
+    async (activeFilters: ContributionFilters) => {
+      try {
+        setLoading(true)
+        const data = await getContributions(activeFilters)
 
-      const contributionsWithRatings = await Promise.all(
-        data.map(async (contribution) => {
-          try {
-            const { avgRating, ratingsCount } = await getRatingsByContribution(
-              contribution.id
-            )
-            return {
-              ...contribution,
-              averageRating: avgRating ?? 0,
-              totalRatings: ratingsCount ?? 0,
+        const contributionsWithRatings = await Promise.all(
+          data.map(async (contribution) => {
+            try {
+              const { avgRating, ratingsCount } =
+                await getRatingsByContribution(contribution.id)
+              return {
+                ...contribution,
+                averageRating: avgRating ?? 0,
+                totalRatings: ratingsCount ?? 0,
+              }
+            } catch (error) {
+              console.error(
+                `Error fetching ratings for contribution ${contribution.id}:`,
+                error
+              )
+              return { ...contribution, averageRating: 0, totalRatings: 0 }
             }
-          } catch (error) {
-            console.error(
-              `Error fetching ratings for contribution ${contribution.id}:`,
-              error
-            )
-            return { ...contribution, averageRating: 0, totalRatings: 0 }
-          }
-        })
-      )
+          })
+        )
 
-      setAllContributions(contributionsWithRatings)
-      setDisplayedContributions(contributionsWithRatings)
-      setError(null)
-    } catch (err) {
-      console.error('Error loading contributions:', err)
-      setError('Error al cargar los recursos. Por favor, intenta nuevamente.')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+        setAllContributions(contributionsWithRatings)
+        setDisplayedContributions(contributionsWithRatings)
+        setError(null)
+      } catch (err) {
+        console.error('Error loading contributions:', err)
+        setError('Error al cargar los recursos. Por favor, intenta nuevamente.')
+      } finally {
+        setLoading(false)
+      }
+    },
+    []
+  )
 
   useEffect(() => {
     fetchContributions(filters)
