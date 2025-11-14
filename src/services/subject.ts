@@ -11,3 +11,16 @@ export const getSubjects = async (carrera: number, year: number) => {
     return []
   }
 }
+
+export const getResourceTypes = async () => {
+  try {
+    const { data } = await api.get('/resourcetypes')
+    return data.data.map(({ id, name }: { id: number; name: string }) => ({
+      id,
+      name,
+    }))
+  } catch (error) {
+    console.error('Error al obtener tipos de recursos:', error)
+    return []
+  }
+}

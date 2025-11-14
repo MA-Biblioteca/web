@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useContribution } from './ContributionContext'
-import { getCareers, getSubjects, createContribution } from '../../services'
+import {
+  getCareers,
+  getSubjects,
+  createContribution,
+  getResourceTypes,
+} from '../../services'
 import ModalNotification from '../../components/ModalNotification/Modal'
 import {
   Box,
@@ -49,7 +54,7 @@ const ContributionForm: React.FC = () => {
   const [showModal, setShowModal] = useState(false)
   const [fileError, setFileError] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+  const [types, setResourceTypes] = useState<{ id: number; name: string }[]>([])
   const years = [
     { name: '1° Año', value: '1' },
     { name: '2° Año', value: '2' },
@@ -58,28 +63,34 @@ const ContributionForm: React.FC = () => {
     { name: '5° Año', value: '5' },
   ]
 
-  const types = [
-    { name: 'Primer Parcial', value: 'Primer Parcial' },
-    { name: 'Final', value: 'Final' },
-    { name: 'TP', value: 'TP' },
-    { name: 'Segundo Parcial', value: 'Segundo Parcial' },
-    {
-      name: 'Primer parcial-primer recuperatorio',
-      value: 'Primer parcial-primer recuperatorio',
-    },
-    {
-      name: 'Primer parcial-segundo recuperatorio',
-      value: 'Primer parcial-segundo recuperatorio',
-    },
-    {
-      name: 'Segundo parcial-primer recuperatorio',
-      value: 'Segundo parcial-primer recuperatorio',
-    },
-    {
-      name: 'Segundo parcial-segundo recuperatorio',
-      value: 'Segundo parcial-segundo recuperatorio',
-    },
-  ]
+  useEffect(() => {
+    getResourceTypes().then((res) => {
+      setResourceTypes(res)
+    })
+  }, [])
+
+  // const types = [
+  //   { name: 'Primer Parcial', value: 'Primer Parcial' },
+  //   { name: 'Final', value: 'Final' },
+  //   { name: 'TP', value: 'TP' },
+  //   { name: 'Segundo Parcial', value: 'Segundo Parcial' },
+  //   {
+  //     name: 'Primer parcial-primer recuperatorio',
+  //     value: 'Primer parcial-primer recuperatorio',
+  //   },
+  //   {
+  //     name: 'Primer parcial-segundo recuperatorio',
+  //     value: 'Primer parcial-segundo recuperatorio',
+  //   },
+  //   {
+  //     name: 'Segundo parcial-primer recuperatorio',
+  //     value: 'Segundo parcial-primer recuperatorio',
+  //   },
+  //   {
+  //     name: 'Segundo parcial-segundo recuperatorio',
+  //     value: 'Segundo parcial-segundo recuperatorio',
+  //   },
+  // ]
 
   useEffect(() => {
     getCareers()
@@ -160,6 +171,7 @@ const ContributionForm: React.FC = () => {
   }
 
   const handleConfirm = async () => {
+    console.log(data)
     if (
       !data.careerId ||
       !data.year ||
@@ -184,7 +196,7 @@ const ContributionForm: React.FC = () => {
         careerId: parseInt(data.careerId, 10),
         subjectId: parseInt(data.subjectId, 10),
         year: parseInt(data.year, 10),
-        resourceType: data.resourceType,
+        resourceTypeId: data.resourceType,
         title: data.title,
         description: data.description,
         files: files,
@@ -329,7 +341,7 @@ const ContributionForm: React.FC = () => {
                     <em>Seleccione el tipo...</em>
                   </MenuItem>
                   {types.map((t) => (
-                    <MenuItem key={t.value} value={t.value}>
+                    <MenuItem key={t.id} value={t.id}>
                       {t.name}
                     </MenuItem>
                   ))}

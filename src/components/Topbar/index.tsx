@@ -20,26 +20,37 @@ import {
   Close as CloseIcon,
   Explore,
   CloudUpload,
-  VerifiedUser,
+  // VerifiedUser,
   AccountCircle,
   Home,
+  Logout,
 } from '@mui/icons-material'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 
 const Topbar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const location = useLocation()
+  const navigate = useNavigate()
+  const { setToken } = useAuth()
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
 
+  const handleLogout = () => {
+    setToken(null)
+    setTimeout(() => {
+      navigate('/login', { replace: true })
+    }, 500)
+  }
+
   const menuItems = [
-    { label: 'Explorar', path: '/explore', icon: <Explore /> },
+    { label: 'Explorar', path: '/', icon: <Explore /> },
     { label: 'Subir', path: '/upload', icon: <CloudUpload /> },
-    { label: 'Moderar', path: '/moderation', icon: <VerifiedUser /> },
+    // { label: 'Moderar', path: '/moderation', icon: <VerifiedUser /> },
     { label: 'Perfil', path: '/profile', icon: <AccountCircle /> },
   ]
 
@@ -48,7 +59,12 @@ const Topbar: React.FC = () => {
   const drawer = (
     <Box
       onClick={handleDrawerToggle}
-      sx={{ width: 280, height: '100%', bgcolor: 'primary.main', color: 'white' }}
+      sx={{
+        width: 280,
+        height: '100%',
+        bgcolor: 'primary.main',
+        color: 'white',
+      }}
     >
       <Box
         sx={{
@@ -62,10 +78,7 @@ const Topbar: React.FC = () => {
         <Typography variant="h6" sx={{ fontWeight: 700 }}>
           Biblioteca de recursos
         </Typography>
-        <IconButton
-          onClick={handleDrawerToggle}
-          sx={{ color: 'white' }}
-        >
+        <IconButton onClick={handleDrawerToggle} sx={{ color: 'white' }}>
           <CloseIcon />
         </IconButton>
       </Box>
@@ -113,6 +126,25 @@ const Topbar: React.FC = () => {
             </ListItemButton>
           </ListItem>
         ))}
+        <ListItem
+          disablePadding
+          sx={{ mt: 1, borderTop: '1px solid rgba(255, 255, 255, 0.12)' }}
+        >
+          <ListItemButton
+            onClick={handleLogout}
+            sx={{
+              color: 'white',
+              '&:hover': {
+                bgcolor: 'rgba(255, 255, 255, 0.1)',
+              },
+            }}
+          >
+            <ListItemIcon sx={{ color: 'white', minWidth: 40 }}>
+              <Logout />
+            </ListItemIcon>
+            <ListItemText primary="Cerrar sesión" />
+          </ListItemButton>
+        </ListItem>
       </List>
     </Box>
   )
@@ -160,7 +192,15 @@ const Topbar: React.FC = () => {
 
             {/* Desktop Menu */}
             {!isMobile && (
-              <Box sx={{ flexGrow: 1, display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  display: 'flex',
+                  gap: 1,
+                  justifyContent: 'flex-end',
+                  alignItems: 'center',
+                }}
+              >
                 {menuItems.map((item) => (
                   <Box
                     key={item.path}
@@ -191,6 +231,32 @@ const Topbar: React.FC = () => {
                     </Typography>
                   </Box>
                 ))}
+                <Box
+                  component="button"
+                  onClick={handleLogout}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    px: 2,
+                    py: 1,
+                    borderRadius: 2,
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    color: 'white',
+                    transition: 'all 0.3s',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      transform: 'translateY(-2px)',
+                    },
+                  }}
+                >
+                  <Logout />
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    Cerrar sesión
+                  </Typography>
+                </Box>
               </Box>
             )}
           </Toolbar>
