@@ -72,3 +72,13 @@ export const createUser = async (user: CreateUser) => {
     throw error
   }
 }
+
+export const verifyUser = async (verifyToken: string) => {
+  try {
+    const response = await api.put(`/users/verify/${verifyToken}`)
+    return response.data
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}

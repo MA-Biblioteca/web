@@ -2,16 +2,17 @@ import React, { useEffect } from 'react'
 import { Box } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import Login from '@/components/auth/Login'
+import { useAuth } from '@/contexts/AuthContext'
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
+    if (isAuthenticated) {
       navigate('/', { replace: true })
     }
-  }, [navigate])
+  }, [isAuthenticated, navigate])
 
   return (
     <Box

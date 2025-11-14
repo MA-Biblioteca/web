@@ -34,6 +34,10 @@ const Register: React.FC = () => {
     validationSchema: Yup.object({
       email: Yup.string()
         .email('Correo inválido')
+        .matches(
+          /@alu\.frlp\.utn\.edu\.ar$/,
+          'El correo debe ser de la UTN FRLP'
+        )
         .required('El correo es obligatorio'),
       password: Yup.string()
         .min(6, 'Debe tener al menos 6 caracteres')
