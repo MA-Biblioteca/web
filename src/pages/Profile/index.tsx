@@ -11,11 +11,7 @@ import {
   Container,
   Button,
 } from '@mui/material'
-import {
-  Email,
-  CalendarToday,
-  CloudUpload,
-} from '@mui/icons-material'
+import { Email, CalendarToday, CloudUpload } from '@mui/icons-material'
 import { getUserProfile, UserProfile } from '@/services/user'
 import { Contribution } from '@/types'
 import ResourceCard from '@/components/ResourceList/ResourceCard'
@@ -98,7 +94,7 @@ const Profile: React.FC = () => {
       setProfile(userProfile)
 
       try {
-        const userContributions = await getContributions(userId)
+        const userContributions = await getContributions({ userId })
         setContributions(userContributions || [])
       } catch (contributionError) {
         console.warn('Error loading contributions:', contributionError)
@@ -116,7 +112,14 @@ const Profile: React.FC = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh',
+        }}
+      >
         <CircularProgress />
       </Box>
     )
@@ -137,7 +140,12 @@ const Profile: React.FC = () => {
     : profile.email.split('@')[0]
 
   const initials = hasName
-    ? displayName.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2)
+    ? displayName
+        .split(' ')
+        .map((n) => n.charAt(0))
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
     : displayName.substring(0, 2).toUpperCase()
 
   return (
@@ -146,9 +154,7 @@ const Profile: React.FC = () => {
         <Container maxWidth="lg">
           <Box sx={{ position: 'relative', py: 6 }}>
             <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
-              <Avatar sx={profileAvatarSx}>
-                {initials}
-              </Avatar>
+              <Avatar sx={profileAvatarSx}>{initials}</Avatar>
 
               <Box sx={{ flex: 1, pt: 1 }}>
                 <Typography variant="h3" sx={profileNameSx}>
@@ -166,7 +172,11 @@ const Profile: React.FC = () => {
                   <Box sx={profileInfoItemSx}>
                     <CalendarToday sx={profileInfoIconSx} />
                     <Typography variant="body2" sx={profileInfoTextSx}>
-                      Miembro desde {new Date(profile.createdAt).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
+                      Miembro desde{' '}
+                      {new Date(profile.createdAt).toLocaleDateString('es-AR', {
+                        month: 'long',
+                        year: 'numeric',
+                      })}
                     </Typography>
                   </Box>
                 </Box>
@@ -183,11 +193,22 @@ const Profile: React.FC = () => {
 
         {contributions.length === 0 ? (
           <Paper sx={emptyStatePaperSx}>
-            <CloudUpload sx={{ fontSize: 64, color: 'text.secondary', mb: 1.5, opacity: 0.5 }} />
+            <CloudUpload
+              sx={{
+                fontSize: 64,
+                color: 'text.secondary',
+                mb: 1.5,
+                opacity: 0.5,
+              }}
+            />
             <Typography variant="h6" color="text.secondary" gutterBottom>
               Todavía no subiste ningún aporte
             </Typography>
-            <Button variant="contained" onClick={() => navigate('/upload')} sx={{ mt: '1rem' }}>
+            <Button
+              variant="contained"
+              onClick={() => navigate('/upload')}
+              sx={{ mt: '1rem' }}
+            >
               Quiero contribuir
             </Button>
           </Paper>
