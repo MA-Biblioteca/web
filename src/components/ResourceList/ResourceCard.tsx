@@ -46,8 +46,6 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
     severity: 'success',
   })
 
-  console.log(contribution)
-
   useEffect(() => {
     const fetchRatings = async () => {
       // Skip if ratings are already provided in the contribution

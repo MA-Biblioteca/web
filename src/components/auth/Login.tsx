@@ -16,9 +16,13 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { login } from '@/services/auth'
+import { useAuth } from '@/contexts/AuthContext'
+import { useSnackbar } from '@/contexts/SnackbarContext'
 
 const Login: React.FC = () => {
   const navigate = useNavigate()
+  const { setToken } = useAuth()
+  const { showError } = useSnackbar()
   const [showPassword, setShowPassword] = useState(false)
 
   const formik = useFormik({
@@ -36,8 +40,27 @@ const Login: React.FC = () => {
       setSubmitting(true)
       try {
         const { token } = await login(values.email, values.password)
-        localStorage.setItem('token', token)
-        navigate('/')
+
+        // Decode token to check verifiedAt
+        try {
+          const payload = token.split('.')[1] // Get payload part of JWT
+          const decoded = JSON.parse(atob(payload))
+
+          if (decoded.verified) {
+            setToken(token)
+            navigate('/')
+          } else {
+            showError(
+              'Tu cuenta no ha sido verificada. Por favor, verifica tu correo electrónico.'
+            )
+          }
+        } catch (decodeError) {
+          // If token decoding fails, still set token and navigate (fallback)
+          console.error('Error decoding token:', decodeError)
+          setToken(token)
+          navigate('/')
+        }
+
         setSubmitting(false)
       } catch (error) {
         console.error('Error de login:', error)

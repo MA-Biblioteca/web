@@ -15,9 +15,12 @@ import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 import ContributionForm from './pages/contribution/ContributionFrom'
 import ContributionDetail from './pages/ContributionDetail'
+import Invite from './pages/Invite'
 
 import { ResourceProvider } from './contexts/ResourceContext'
 import { ContributionProvider } from './pages/contribution/ContributionContext'
+import { SnackbarProvider } from './contexts/SnackbarContext'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 
 import Layout from './components/Layout'
 
@@ -33,44 +36,54 @@ const theme = createTheme({
   },
 })
 
+const AppRoutes = () => {
+  const { isAuthenticated } = useAuth()
+
+  return (
+    <Routes>
+      {isAuthenticated ? (
+        <>
+          <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="/register" element={<Navigate to="/" replace />} />
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="explore" element={<Explore />} />
+            <Route path="contributions/:id" element={<ContributionDetail />} />
+            <Route
+              path="upload"
+              element={
+                <ContributionProvider>
+                  <ContributionForm />
+                </ContributionProvider>
+              }
+            />
+            <Route path="profile" element={<Profile />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </>
+      ) : (
+        <>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/invite/:verifyToken" element={<Invite />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </>
+      )}
+    </Routes>
+  )
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <ResourceProvider>
-    <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Routes>
-          {localStorage.getItem('token') ? (
-            <>
-              <Route path="/login" element={<Navigate to="/" replace />} />
-              <Route path="/register" element={<Navigate to="/" replace />} />
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Home />} />
-                <Route path="explore" element={<Explore />} />
-                <Route
-                  path="contributions/:id"
-                  element={<ContributionDetail />}
-                />
-                <Route
-                  path="upload"
-                  element={
-                    <ContributionProvider>
-                      <ContributionForm />
-                    </ContributionProvider>
-                  }
-                />
-                <Route path="profile" element={<Profile />} />
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </>
-          ) : (
-            <>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </>
-          )}
-        </Routes>
-      </ThemeProvider>
-    </BrowserRouter>
-  </ResourceProvider>
+  <SnackbarProvider>
+    <AuthProvider>
+      <ResourceProvider>
+        <BrowserRouter>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <AppRoutes />
+          </ThemeProvider>
+        </BrowserRouter>
+      </ResourceProvider>
+    </AuthProvider>
+  </SnackbarProvider>
 )

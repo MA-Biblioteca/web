@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -8,16 +9,18 @@ import {
   CircularProgress,
   Alert,
   Container,
+  Button,
 } from '@mui/material'
 import {
   Email,
   CalendarToday,
+  CloudUpload,
 } from '@mui/icons-material'
-import { mockUserProfile } from '@/__mocks__/profileMock'
-import { UserProfile } from '@/services/user'
+import { getUserProfile, UserProfile } from '@/services/user'
 import { Contribution } from '@/types'
 import ResourceCard from '@/components/ResourceList/ResourceCard'
 import { getContributions } from '@/services/contribution'
+import { useAuth } from '@/contexts/AuthContext'
 import {
   profileHeaderPaperSx,
   profileAvatarSx,
@@ -30,7 +33,19 @@ import {
   emptyStatePaperSx,
 } from './styles'
 
+interface DecodedToken {
+  id: number
+  email: string
+  firstName?: string | null
+  lastName?: string | null
+  verified?: string
+  role: string
+  sub: string
+}
+
 const Profile: React.FC = () => {
+  const { token } = useAuth()
+  const navigate = useNavigate()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [contributions, setContributions] = useState<Contribution[]>([])
   const [loading, setLoading] = useState(true)
@@ -38,24 +53,61 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     loadProfileData()
-  }, [])
+  }, [token])
+
+  const decodeToken = (token: string): DecodedToken | null => {
+    try {
+      const payload = token.split('.')[1]
+      const decoded = JSON.parse(atob(payload))
+      return decoded
+    } catch (error) {
+      console.error('Error decoding token:', error)
+      return null
+    }
+  }
 
   const loadProfileData = async () => {
     try {
       setLoading(true)
-      setProfile(mockUserProfile)
+      setError(null)
 
-      const userId = mockUserProfile.id
-      if (userId && typeof userId === 'number') {
+      if (!token) {
+        setError('Se te venció la sesión, por favor iniciá sesión de nuevo')
+        setLoading(false)
+        return
+      }
+
+      const decodedToken = decodeToken(token)
+
+      if (!decodedToken) {
+        setError('Hubo un error cargando el perfil del usuario')
+        setLoading(false)
+        return
+      }
+
+      const userId = decodedToken.id
+
+      const userProfile = await getUserProfile(userId)
+
+      if (!userProfile) {
+        setError('Hubo un error cargando el perfil del usuario')
+        setLoading(false)
+        return
+      }
+
+      setProfile(userProfile)
+
+      try {
         const userContributions = await getContributions(userId)
-        setContributions(userContributions)
-      } else {
-        // TO DO: Eliminar este fallback cuando el login/registro esté funcional 100%
-        const allContributions = await getContributions()
-        setContributions(allContributions)
+        setContributions(userContributions || [])
+      } catch (contributionError) {
+        console.warn('Error loading contributions:', contributionError)
+        setContributions([])
       }
     } catch (err) {
+      console.error('Error loading profile:', err)
       setError('Error al cargar el perfil')
+      setProfile(null)
       setContributions([])
     } finally {
       setLoading(false)
@@ -78,8 +130,15 @@ const Profile: React.FC = () => {
     )
   }
 
-  const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'Usuario'
-  const initials = fullName.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2)
+  const hasName = profile.firstName || profile.lastName
+
+  const displayName = hasName
+    ? [profile.firstName, profile.lastName].filter(Boolean).join(' ')
+    : profile.email.split('@')[0]
+
+  const initials = hasName
+    ? displayName.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2)
+    : displayName.substring(0, 2).toUpperCase()
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f8f9fa' }}>
@@ -93,18 +152,16 @@ const Profile: React.FC = () => {
 
               <Box sx={{ flex: 1, pt: 1 }}>
                 <Typography variant="h3" sx={profileNameSx}>
-                  {fullName}
+                  {displayName}
                 </Typography>
 
                 <Box sx={profileInfoContainerSx}>
-                  {profile.email && (
-                    <Box sx={profileInfoItemSx}>
-                      <Email sx={profileInfoIconSx} />
-                      <Typography variant="body2" sx={profileInfoTextSx}>
-                        {profile.email}
-                      </Typography>
-                    </Box>
-                  )}
+                  <Box sx={profileInfoItemSx}>
+                    <Email sx={profileInfoIconSx} />
+                    <Typography variant="body2" sx={profileInfoTextSx}>
+                      {profile.email}
+                    </Typography>
+                  </Box>
 
                   <Box sx={profileInfoItemSx}>
                     <CalendarToday sx={profileInfoIconSx} />
@@ -126,9 +183,13 @@ const Profile: React.FC = () => {
 
         {contributions.length === 0 ? (
           <Paper sx={emptyStatePaperSx}>
+            <CloudUpload sx={{ fontSize: 64, color: 'text.secondary', mb: 1.5, opacity: 0.5 }} />
             <Typography variant="h6" color="text.secondary" gutterBottom>
               Todavía no subiste ningún aporte
             </Typography>
+            <Button variant="contained" onClick={() => navigate('/upload')} sx={{ mt: '1rem' }}>
+              Quiero contribuir
+            </Button>
           </Paper>
         ) : (
           <Grid container spacing={3}>
@@ -145,4 +206,3 @@ const Profile: React.FC = () => {
 }
 
 export default Profile
-
