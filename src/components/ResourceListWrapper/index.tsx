@@ -12,27 +12,22 @@ import { getRatingsByContribution } from '@/services/ratings'
 import { Contribution } from '@/types'
 import SortDropdown from '../ShortDropdown/index'
 import ResourceCard from '../ResourceList/ResourceCard'
-import ResourceFilters from '../ResourceFilters' // <-- 1. IMPORTA EL NUEVO COMPONENTE
+import ResourceFilters from '../ResourceFilters'
 
 const ResourceListWrapper: React.FC = () => {
   const [allContributions, setAllContributions] = useState<Contribution[]>([])
-  // Estado para la lista que se muestra (ya filtrada y ordenada)
   const [displayedContributions, setDisplayedContributions] = useState<
     Contribution[]
   >([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  // --- 2. AÑADE ESTADO PARA LOS FILTROS ---
   const [filters, setFilters] = useState<ContributionFilters>({})
 
-  // 3. CREA UNA FUNCIÓN PARA CARGAR LOS DATOS
   const fetchContributions = useCallback(async (activeFilters: ContributionFilters) => {
     try {
       setLoading(true)
-      // Pasa los filtros al servicio
       const data = await getContributions(activeFilters)
 
-      // El fetch de ratings se mantiene
       const contributionsWithRatings = await Promise.all(
         data.map(async (contribution) => {
           try {
@@ -54,9 +49,7 @@ const ResourceListWrapper: React.FC = () => {
         })
       )
 
-      // Guarda la lista original sin ordenar
       setAllContributions(contributionsWithRatings)
-      // Guarda la lista que se va a mostrar (y que el SortDropdown modificará)
       setDisplayedContributions(contributionsWithRatings)
       setError(null)
     } catch (err) {
@@ -65,28 +58,20 @@ const ResourceListWrapper: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, []) // El useCallback asegura que la función no cambie
+  }, [])
 
-  // 4. LLAMA AL FETCH INICIAL Y CUANDO CAMBIEN LOS FILTROS
   useEffect(() => {
     fetchContributions(filters)
-  }, [filters, fetchContributions]) // Se re-ejecuta cuando cambian los filtros
+  }, [filters, fetchContributions])
 
-  // 5. MANEJADOR PARA CUANDO LOS FILTROS SE ACTUALICEN
   const handleFilterChange = (newFilters: ContributionFilters) => {
     setFilters(newFilters)
   }
 
-  // El componente de SortDropdown ya funciona bien,
-  // porque modifica el estado 'displayedContributions'
-  // que ahora es un estado separado.
-
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* 6. RENDERIZA EL COMPONENTE DE FILTROS */}
       <ResourceFilters onFilterChange={handleFilterChange} />
 
-      {/* --- EL RESTO DEL COMPONENTE --- */}
       <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
         <Box
           sx={{
@@ -108,8 +93,8 @@ const ResourceListWrapper: React.FC = () => {
           </Box>
 
           <SortDropdown
-            contributions={allContributions} // Pasa la lista original
-            setContributions={setDisplayedContributions} // Deja que actualice la lista a mostrar
+            contributions={allContributions}
+            setContributions={setDisplayedContributions}
           />
         </Box>
 
