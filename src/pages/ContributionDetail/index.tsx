@@ -196,13 +196,18 @@ const ContributionDetail: React.FC = () => {
     })
   }
 
-  const getResourceTypeColor = (type: string) => {
-    const typeColors: { [key: string]: string } = {
-      exam: '#1976d2',
-      Final: '#f50057',
-      parcial: '#ff9800',
-      apunte: '#4caf50',
-      ejercicios: '#9c27b0',
+  const getResourceTypeColor = (type: number) => {
+    const typeColors: { [key: number]: string } = {
+      1: '#1976d2',
+      2: '#f50057',
+      3: '#ff9800',
+      4: '#4caf50',
+      5: '#9c27b0',
+      6: '#1976d2',
+      7: '#f50057',
+      8: '#4caf50',
+      9: '#9c27b0',
+      10: '#4caf50',
     }
     return typeColors[type] || '#757575'
   }
@@ -298,7 +303,7 @@ const ContributionDetail: React.FC = () => {
                 }
                 sx={{
                   backgroundColor: getResourceTypeColor(
-                    contribution.resourceType
+                    contribution.resourceType.id
                   ),
                   color: 'white',
                   fontWeight: 600,
@@ -308,10 +313,10 @@ const ContributionDetail: React.FC = () => {
                 variant="outlined"
               />
               <Chip
-                label={contribution.resourceType}
+                label={contribution.resourceType.name}
                 sx={{
                   backgroundColor: getResourceTypeColor(
-                    contribution.resourceType
+                    contribution.resourceType.id
                   ),
                   color: 'white',
                   fontWeight: 600,
@@ -426,15 +431,17 @@ const ContributionDetail: React.FC = () => {
                       disabled={downloading || downloadingFileId !== null}
                       sx={{
                         borderColor: getResourceTypeColor(
-                          contribution.resourceType
+                          contribution.resourceType.id
                         ),
-                        color: getResourceTypeColor(contribution.resourceType),
+                        color: getResourceTypeColor(
+                          contribution.resourceType.id
+                        ),
                         '&:hover': {
                           borderColor: getResourceTypeColor(
-                            contribution.resourceType
+                            contribution.resourceType.id
                           ),
                           backgroundColor: `${getResourceTypeColor(
-                            contribution.resourceType
+                            contribution.resourceType.id
                           )}10`,
                         },
                       }}
@@ -497,13 +504,13 @@ const ContributionDetail: React.FC = () => {
                         disabled={downloading || downloadingFileId !== null}
                         sx={{
                           backgroundColor: getResourceTypeColor(
-                            contribution.resourceType
+                            contribution.resourceType.id
                           ),
                           flexShrink: 0,
                           ml: 2,
                           '&:hover': {
                             backgroundColor: getResourceTypeColor(
-                              contribution.resourceType
+                              contribution.resourceType.id
                             ),
                             filter: 'brightness(0.9)',
                           },
@@ -541,14 +548,16 @@ const ContributionDetail: React.FC = () => {
                       <Avatar
                         sx={{ bgcolor: '#1976d2', width: 40, height: 40 }}
                       >
-                        {comment.user?.name?.charAt(0).toUpperCase() || 'U'}
+                        {comment.user?.firstName?.charAt(0).toUpperCase() ||
+                          comment.user?.email?.charAt(0).toUpperCase() ||
+                          'U'}
                       </Avatar>
                       <Box sx={{ flex: 1 }}>
                         <Typography
                           variant="subtitle2"
                           sx={{ fontWeight: 600, mb: 0.5 }}
                         >
-                          {comment.user?.name || 'Usuario'}
+                          {comment.user?.email}
                         </Typography>
                         <Typography
                           variant="caption"

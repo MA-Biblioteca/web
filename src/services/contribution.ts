@@ -5,7 +5,7 @@ export interface CreateContributionData {
   careerId: number
   subjectId: number
   year: number
-  resourceType: string
+  resourceTypeId: string
   title: string
   description: string
   files: File[]
@@ -19,7 +19,7 @@ export const createContribution = async (data: CreateContributionData) => {
     formData.append('careerId', data.careerId.toString())
     formData.append('subjectId', data.subjectId.toString())
     formData.append('year', data.year.toString())
-    formData.append('resourceType', data.resourceType)
+    formData.append('resourceTypeId', data.resourceTypeId)
     formData.append('title', data.title)
     formData.append('description', data.description)
 
@@ -41,16 +41,16 @@ export const createContribution = async (data: CreateContributionData) => {
   }
 }
 
-export const getContributions = async (): Promise<Contribution[]> => {
+export const getContributions = async (userId?: number): Promise<Contribution[]> => {
   try {
-    const response = await api.get('/contributions')
+    const params = userId ? { userId } : {}
+    const response = await api.get('/contributions', { params })
     const data = response.data?.data
 
-    // ✅ Devuelve siempre un array, incluso si la API no responde bien
     return Array.isArray(data) ? data : []
   } catch (error) {
     console.error('Error fetching contributions:', error)
-    return [] // evita romper el frontend
+    return []
   }
 }
 

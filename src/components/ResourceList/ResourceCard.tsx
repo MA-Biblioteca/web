@@ -114,13 +114,18 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
     })
   }
 
-  const getResourceTypeColor = (type: string) => {
-    const typeColors: { [key: string]: string } = {
-      exam: '#1976d2',
-      Final: '#f50057',
-      parcial: '#ff9800',
-      apunte: '#4caf50',
-      ejercicios: '#9c27b0',
+  const getResourceTypeColor = (type: number) => {
+    const typeColors: { [key: number]: string } = {
+      1: '#1976d2',
+      2: '#f50057',
+      3: '#ff9800',
+      4: '#4caf50',
+      5: '#9c27b0',
+      6: '#1976d2',
+      7: '#f50057',
+      8: '#4caf50',
+      9: '#9c27b0',
+      10: '#4caf50',
     }
     return typeColors[type] || '#757575'
   }
@@ -147,7 +152,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
       <Box
         sx={{
           height: '6px',
-          background: `linear-gradient(90deg, ${getResourceTypeColor(contribution.resourceType)}, ${getResourceTypeColor(contribution.resourceType)}dd)`,
+          background: `linear-gradient(90deg, ${getResourceTypeColor(contribution.resourceType.id)}, ${getResourceTypeColor(contribution.resourceType.id)}dd)`,
         }}
       />
 
@@ -175,11 +180,11 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
               {contribution.title}
             </Typography>
             <Chip
-              label={contribution.resourceType}
+              label={contribution.resourceType.name}
               size="small"
               sx={{
                 backgroundColor: getResourceTypeColor(
-                  contribution.resourceType
+                  contribution.resourceType.id
                 ),
                 color: 'white',
                 fontWeight: 600,
@@ -325,9 +330,11 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ contribution }) => {
                       onClick={handleDownload}
                       disabled={downloading}
                       sx={{
-                        color: getResourceTypeColor(contribution.resourceType),
+                        color: getResourceTypeColor(
+                          contribution.resourceType.id
+                        ),
                         '&:hover': {
-                          backgroundColor: `${getResourceTypeColor(contribution.resourceType)}15`,
+                          backgroundColor: `${getResourceTypeColor(contribution.resourceType.id)}15`,
                         },
                         '&.Mui-disabled': {
                           color: '#ccc',
