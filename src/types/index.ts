@@ -69,6 +69,7 @@ export interface Contribution {
   averageRating?: number
   totalRatings?: number
   userRating?: number
+  userId?: number  // Agregado: id del propietario (deberá devolverlo el backend)
 }
 
 export interface UpdateUser {

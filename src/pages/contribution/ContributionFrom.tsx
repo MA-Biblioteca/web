@@ -47,7 +47,7 @@ import {
 interface ExistingFile {
   id: number
   originalName: string
-  size: number
+  size?: number // Hacer opcional
 }
 
 const ContributionForm: React.FC = () => {
@@ -502,7 +502,7 @@ const ContributionForm: React.FC = () => {
                     >
                       <ListItemText
                         primary={file.originalName}
-                        secondary={`${(file.size / 1024 / 1024).toFixed(2)} MB`}
+                        secondary={`${((file.size || 0) / 1024 / 1024).toFixed(2)} MB`}
                       />
                       <ListItemSecondaryAction>
                         <IconButton
@@ -577,7 +577,7 @@ const ContributionForm: React.FC = () => {
                             >
                               <ListItemText
                                 primary={file.originalName}
-                                secondary={`${(file.size / 1024 / 1024).toFixed(2)} MB`}
+                                secondary={`${((file.size || 0) / 1024 / 1024).toFixed(2)} MB`}
                               />
                               <ListItemSecondaryAction>
                                 <IconButton
@@ -692,15 +692,8 @@ const ContributionForm: React.FC = () => {
 
       {/* Success Modal */}
       {showModal && (
-        <ModalNotification 
-          type="success" 
-          message={`Contribución ${isEditMode ? 'actualizada' : 'creada'} exitosamente`}
-          onClose={() => {
-            setShowModal(false)
-            navigate('/')
-          }}
-        />
-      )}
+        <ModalNotification type="success" />
+       )}
     </Container>
   )
 }
