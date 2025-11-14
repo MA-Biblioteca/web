@@ -41,12 +41,28 @@ export const createContribution = async (data: CreateContributionData) => {
   }
 }
 
-export const getContributions = async (userId?: number): Promise<Contribution[]> => {
-  try {
-    const params = userId ? { userId } : {}
-    const response = await api.get('/contributions', { params })
-    const data = response.data?.data
+export interface ContributionFilters {
+  careerId?: number
+  subjectId?: number
+  year?: number
+  resourceTypeId?: number
+  userId?: number
+}
 
+export const getContributions = async (
+  filters: ContributionFilters = {}
+): Promise<Contribution[]> => {
+  try {
+    const activeFilters: Record<string, any> = {}
+    for (const key in filters) {
+      const filterKey = key as keyof ContributionFilters
+      if (filters[filterKey] || filters[filterKey] === 0) {
+        activeFilters[filterKey] = filters[filterKey]
+      }
+    }
+
+    const response = await api.get('/contributions', { params: activeFilters })
+    const data = response.data?.data
     return Array.isArray(data) ? data : []
   } catch (error) {
     console.error('Error fetching contributions:', error)
