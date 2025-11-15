@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useContribution } from './ContributionContext'
 import {
   getCareers,
@@ -52,7 +52,6 @@ interface ExistingFile {
 
 const ContributionForm: React.FC = () => {
   const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
   const { data, setData } = useContribution()
   const [files, setFiles] = useState<File[]>([])
   const [existingFiles, setExistingFiles] = useState<ExistingFile[]>([])
