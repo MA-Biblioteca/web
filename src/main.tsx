@@ -57,6 +57,12 @@ const AppRoutes = () => {
                 </ContributionProvider>
               }
             />
+            <Route path="upload/:id" element={
+                <ContributionProvider>
+                  <ContributionForm />
+                </ContributionProvider>
+              } 
+            />
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Route>

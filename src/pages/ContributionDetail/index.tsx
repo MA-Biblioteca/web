@@ -25,6 +25,7 @@ import {
   Download as DownloadIcon,
   Description as DescriptionIcon,
   Send as SendIcon,
+  Edit as EditIcon,
 } from '@mui/icons-material'
 
 import {
@@ -37,10 +38,12 @@ import { addComment } from '@/services/comments'
 import { Contribution, Comment } from '@/types'
 import StarRating from '@/components/StarRating'
 import { bigIconSx } from '@/styles/global'
+import { useAuth } from '@/contexts/AuthContext'
 
 const ContributionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { userData } = useAuth()
   const [contribution, setContribution] = useState<Contribution | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -85,12 +88,17 @@ const ContributionDetail: React.FC = () => {
   }, [id])
 
   const getRatings = async () => {
-    if (!contribution) return
     const { avgRating, ratingsCount } = await getRatingsByContribution(
-      Number(contribution?.id)
+      Number(id)
     )
     setAvgRating(avgRating ?? 0)
     setTotalRatings(ratingsCount ?? 0)
+  }
+
+  // Función para verificar si el usuario actual es el dueño de la contribución
+  const isOwner = () => {
+    if (!userData.id || !contribution) return false
+    return userData.id === contribution.userId
   }
 
   const handleRatingChange = async (newValue: number) => {
@@ -126,7 +134,18 @@ const ContributionDetail: React.FC = () => {
       const newComment = await addComment(contribution.id, commentText)
       setContribution({
         ...contribution,
-        comments: [...(contribution.comments || []), newComment],
+        comments: [
+          ...(contribution.comments || []),
+          {
+            ...newComment,
+            user: {
+              id: userData.id,
+              email: userData.email,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+            },
+          },
+        ],
       })
       setSnackbar({
         open: true,
@@ -185,6 +204,11 @@ const ContributionDetail: React.FC = () => {
     } finally {
       setDownloadingFileId(null)
     }
+  }
+
+  const handleEdit = () => {
+    if (!contribution) return
+    navigate(`/upload/${contribution.id}`)
   }
 
   const formatDate = (dateString: string) => {
@@ -268,13 +292,30 @@ const ContributionDetail: React.FC = () => {
       <Container maxWidth="lg">
         {/* Header */}
         <Box sx={{ mb: 3 }}>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate('/')}
-            sx={{ mb: 2 }}
-          >
-            Volver
-          </Button>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')}>
+              Volver
+            </Button>
+
+            {/* BOTÓN DE EDITAR - SOLO PARA EL PROPIETARIO */}
+            {isOwner() && (
+              <Button
+                variant="outlined"
+                startIcon={<EditIcon />}
+                onClick={handleEdit}
+                sx={{
+                  borderColor: 'primary.main',
+                  color: 'primary.main',
+                  '&:hover': {
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                  },
+                }}
+              >
+                Editar
+              </Button>
+            )}
+          </Stack>
         </Box>
 
         {/* Main Content */}
