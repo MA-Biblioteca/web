@@ -119,3 +119,58 @@ export const downloadAllFiles = async (
     throw error
   }
 }
+
+export interface UpdateContributionData {
+  careerId?: number
+  subjectId?: number
+  year?: number
+  resourceTypeId?: string
+  title?: string
+  description?: string
+  files?: File[] // nuevos archivos a agregar
+  filesToDelete?: number[] // IDs de archivos existentes a eliminar
+}
+
+export const updateContribution = async (
+  id: number,
+  data: UpdateContributionData
+) => {
+  try {
+    const formData = new FormData()
+
+    // Append form fields
+    if (data.careerId !== undefined)
+      formData.append('careerId', data.careerId.toString())
+    if (data.subjectId !== undefined)
+      formData.append('subjectId', data.subjectId.toString())
+    if (data.year !== undefined) formData.append('year', data.year.toString())
+    if (data.resourceTypeId !== undefined)
+      formData.append('resourceTypeId', data.resourceTypeId)
+    if (data.title !== undefined) formData.append('title', data.title)
+    if (data.description !== undefined)
+      formData.append('description', data.description)
+
+    // Append new files
+    if (data.files?.length) {
+      data.files.forEach((file) => formData.append('files', file))
+    }
+
+    // Append files to delete
+    if (data.filesToDelete?.length) {
+      data.filesToDelete.forEach((fileId) =>
+        formData.append('filesToDelete', fileId.toString())
+      )
+    }
+
+    const response = await api.patch(`/contributions/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    return response.data
+  } catch (error) {
+    console.error('Error updating contribution:', error)
+    throw error
+  }
+}

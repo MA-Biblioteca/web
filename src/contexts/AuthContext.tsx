@@ -10,6 +10,12 @@ interface AuthContextType {
   token: string | null
   isAuthenticated: boolean
   setToken: (token: string | null) => void
+  userData: {
+    email: string
+    id: number
+    firstName?: string
+    lastName?: string
+  }
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -30,6 +36,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setTokenState] = useState<string | null>(() => {
     return localStorage.getItem('token')
   })
+
+  const [userData, setUserData] = useState<{
+    id: number
+    email: string
+    firstName?: string
+    lastName?: string
+  }>({ email: '', id: 0 })
 
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
@@ -53,11 +66,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => clearInterval(interval)
   }, [token])
 
+  const decodeToken = (token: string) => {
+    try {
+      const payload = token.split('.')[1]
+      const decoded = JSON.parse(atob(payload))
+      return decoded
+    } catch (error) {
+      console.error('Error decoding token:', error)
+      return null
+    }
+  }
+
   const setToken = (newToken: string | null) => {
     if (newToken) {
       localStorage.setItem('token', newToken)
+      const { email, firstName, lastName, id } = decodeToken(newToken)
+      setUserData({ email, firstName, lastName, id })
     } else {
       localStorage.removeItem('token')
+      setUserData({ email: '', id: 0 })
     }
     setTokenState(newToken)
   }
@@ -68,6 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         token,
         isAuthenticated: !!token,
         setToken,
+        userData,
       }}
     >
       {children}

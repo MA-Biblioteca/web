@@ -11,6 +11,7 @@ export interface Career {
 export interface Subject {
   id: number
   name: string
+  year: number
 }
 
 export interface CareerSubject {
@@ -69,6 +70,7 @@ export interface Contribution {
   averageRating?: number
   totalRatings?: number
   userRating?: number
+  userId?: number // Agregado: id del propietario (deberá devolverlo el backend)
 }
 
 export interface UpdateUser {
