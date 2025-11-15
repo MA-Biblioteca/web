@@ -11,11 +11,11 @@ const UploadNotificationModal: React.FC<{ type: string }> = ({ type }) => {
   }
 
   const handleRetry = () => {
-    navigate('/subir') // Ajusta la ruta según corresponda para reintentar
+    navigate('/upload') // Ajusta la ruta según corresponda para reintentar
   }
 
   const handleNew = () => {
-    navigate('/subir') // Ajusta la ruta según corresponda para subir otro contribution
+    navigate('/upload') // Ajusta la ruta según corresponda para subir otro contribution
   }
 
   return (

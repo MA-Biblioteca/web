@@ -70,13 +70,14 @@ const ContributionForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [types, setResourceTypes] = useState<{ id: number; name: string }[]>([])
   const [loading, setLoading] = useState(isEditMode)
-  
+
   const years = [
     { name: '1° Año', value: '1' },
     { name: '2° Año', value: '2' },
     { name: '3° Año', value: '3' },
     { name: '4° Año', value: '4' },
     { name: '5° Año', value: '5' },
+    { name: 'Electiva', value: '0' },
   ]
 
   // Resetear el formulario cuando cambia el modo
@@ -100,22 +101,21 @@ const ContributionForm: React.FC = () => {
   useEffect(() => {
     const loadContributionData = async () => {
       if (!id) return
-      
+
       try {
         setLoading(true)
         const contribution = await getContributionById(Number(id))
-        
+
         // Llenar el formulario con los datos existentes
         setData('careerId', contribution.careerSubject.career.id.toString())
-        setData('year', contribution.year.toString())
+        setData('year', contribution.careerSubject.subject.year.toString())
         setData('subjectId', contribution.careerSubject.subject.id.toString())
         setData('resourceType', contribution.resourceType.id.toString())
         setData('title', contribution.title)
         setData('description', contribution.description)
-        
+
         // Cargar archivos existentes
         setExistingFiles(contribution.files || [])
-        
       } catch (error) {
         console.error('Error loading contribution:', error)
         setFileError('Error al cargar la contribución para editar')
@@ -217,7 +217,7 @@ const ContributionForm: React.FC = () => {
   }
 
   const handleRemoveExistingFile = (fileId: number) => {
-    setExistingFiles(existingFiles.filter(file => file.id !== fileId))
+    setExistingFiles(existingFiles.filter((file) => file.id !== fileId))
     setFilesToDelete([...filesToDelete, fileId])
   }
 
@@ -233,13 +233,13 @@ const ContributionForm: React.FC = () => {
       setFileError('Completa todos los campos antes de confirmar')
       return
     }
-    
+
     // En modo edición, permitir enviar sin archivos nuevos si hay archivos existentes
     if (!isEditMode && files.length === 0) {
       setFileError('Debes seleccionar al menos un archivo')
       return
     }
-    
+
     if (isEditMode && files.length === 0 && existingFiles.length === 0) {
       setFileError('Debe haber al menos un archivo')
       return
@@ -276,9 +276,9 @@ const ContributionForm: React.FC = () => {
 
       setShowModal(true)
       // Redirigir después de éxito
-      setTimeout(() => {
-        navigate('/')
-      }, 2000)
+      // setTimeout(() => {
+      //   navigate('/')
+      // }, 2000)
     } catch (error: any) {
       console.log(error.response?.data?.message)
       setFileError(
@@ -292,7 +292,12 @@ const ContributionForm: React.FC = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="400px"
+      >
         <CircularProgress />
         <Typography variant="body1" sx={{ ml: 2 }}>
           Cargando contribución...
@@ -315,8 +320,8 @@ const ContributionForm: React.FC = () => {
               {isEditMode ? 'Editar Aporte' : 'Carga de Aporte'}
             </Typography>
             <Typography variant="body1" className="text-gray-600">
-              {isEditMode 
-                ? 'Modifica los datos de tu contribución académica' 
+              {isEditMode
+                ? 'Modifica los datos de tu contribución académica'
                 : 'Completa los datos para subir tu contribución académica'}
             </Typography>
           </Box>
@@ -520,7 +525,8 @@ const ContributionForm: React.FC = () => {
             )}
 
             {/* Upload Area para nuevos archivos */}
-            {files.length === 0 && (!isEditMode || existingFiles.length === 0) ? (
+            {files.length === 0 &&
+            (!isEditMode || existingFiles.length === 0) ? (
               <Paper
                 className="p-12 text-center border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
                 onClick={() => fileInputRef.current?.click()}
@@ -530,7 +536,9 @@ const ContributionForm: React.FC = () => {
                   sx={{ fontSize: 64 }}
                 />
                 <Typography variant="h6" className="mb-2 text-gray-700">
-                  {isEditMode ? 'Agregar nuevos documentos' : 'Subir documentos'}
+                  {isEditMode
+                    ? 'Agregar nuevos documentos'
+                    : 'Subir documentos'}
                 </Typography>
                 <Typography variant="body2" className="text-gray-500 mb-4">
                   Haz clic para seleccionar archivos o arrástralos aquí
@@ -550,11 +558,14 @@ const ContributionForm: React.FC = () => {
             ) : (
               <Box>
                 {/* File List para nuevos archivos */}
-                {(files.length > 0 || (isEditMode && existingFiles.length > 0)) && (
+                {(files.length > 0 ||
+                  (isEditMode && existingFiles.length > 0)) && (
                   <Paper className="p-4 bg-gray-50 mb-4">
                     <Box className="flex justify-between items-center mb-3">
                       <Typography variant="subtitle1" className="font-semibold">
-                        {isEditMode ? 'Archivos (existentes y nuevos)' : 'Documentos seleccionados'}
+                        {isEditMode
+                          ? 'Archivos (existentes y nuevos)'
+                          : 'Documentos seleccionados'}
                       </Typography>
                       <Chip
                         label={`${files.length + existingFiles.length} archivos`}
@@ -562,11 +573,14 @@ const ContributionForm: React.FC = () => {
                         size="small"
                       />
                     </Box>
-                    
+
                     {/* Lista de archivos existentes */}
                     {existingFiles.length > 0 && (
                       <>
-                        <Typography variant="body2" className="text-gray-600 mb-2">
+                        <Typography
+                          variant="body2"
+                          className="text-gray-600 mb-2"
+                        >
                           Archivos existentes:
                         </Typography>
                         <List>
@@ -582,7 +596,9 @@ const ContributionForm: React.FC = () => {
                               <ListItemSecondaryAction>
                                 <IconButton
                                   edge="end"
-                                  onClick={() => handleRemoveExistingFile(file.id)}
+                                  onClick={() =>
+                                    handleRemoveExistingFile(file.id)
+                                  }
                                   color="error"
                                 >
                                   <Delete />
@@ -593,12 +609,15 @@ const ContributionForm: React.FC = () => {
                         </List>
                       </>
                     )}
-                    
+
                     {/* Lista de nuevos archivos */}
                     {files.length > 0 && (
                       <>
                         {existingFiles.length > 0 && (
-                          <Typography variant="body2" className="text-gray-600 mb-2 mt-4">
+                          <Typography
+                            variant="body2"
+                            className="text-gray-600 mb-2 mt-4"
+                          >
                             Nuevos archivos:
                           </Typography>
                         )}
@@ -630,7 +649,8 @@ const ContributionForm: React.FC = () => {
                     {/* File Summary */}
                     <Box className="mt-4 p-3 bg-blue-50 rounded-lg flex justify-between items-center">
                       <Typography variant="body2" className="text-blue-700">
-                        <strong>Total archivos:</strong> {files.length + existingFiles.length}
+                        <strong>Total archivos:</strong>{' '}
+                        {files.length + existingFiles.length}
                       </Typography>
                       <Typography variant="body2" className="text-blue-700">
                         <strong>Tamaño nuevos:</strong>{' '}
@@ -672,7 +692,11 @@ const ContributionForm: React.FC = () => {
               variant="contained"
               size="large"
               onClick={handleConfirm}
-              disabled={(files.length === 0 && (!isEditMode || existingFiles.length === 0)) || isSubmitting}
+              disabled={
+                (files.length === 0 &&
+                  (!isEditMode || existingFiles.length === 0)) ||
+                isSubmitting
+              }
               startIcon={
                 isSubmitting ? (
                   <CircularProgress size={20} color="inherit" />
@@ -682,18 +706,20 @@ const ContributionForm: React.FC = () => {
               }
               className="bg-blue-600 hover:bg-blue-700 px-8 py-3 text-lg font-semibold"
             >
-              {isSubmitting 
-                ? (isEditMode ? 'Actualizando...' : 'Enviando...') 
-                : (isEditMode ? 'Actualizar Contribución' : 'Confirmar Contribución')}
+              {isSubmitting
+                ? isEditMode
+                  ? 'Actualizando...'
+                  : 'Enviando...'
+                : isEditMode
+                  ? 'Actualizar Contribución'
+                  : 'Confirmar Contribución'}
             </Button>
           </Box>
         </CardContent>
       </Card>
 
       {/* Success Modal */}
-      {showModal && (
-        <ModalNotification type="success" />
-       )}
+      {showModal && <ModalNotification type="success" />}
     </Container>
   )
 }

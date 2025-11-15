@@ -139,12 +139,16 @@ export const updateContribution = async (
     const formData = new FormData()
 
     // Append form fields
-    if (data.careerId !== undefined) formData.append('careerId', data.careerId.toString())
-    if (data.subjectId !== undefined) formData.append('subjectId', data.subjectId.toString())
+    if (data.careerId !== undefined)
+      formData.append('careerId', data.careerId.toString())
+    if (data.subjectId !== undefined)
+      formData.append('subjectId', data.subjectId.toString())
     if (data.year !== undefined) formData.append('year', data.year.toString())
-    if (data.resourceTypeId !== undefined) formData.append('resourceTypeId', data.resourceTypeId)
+    if (data.resourceTypeId !== undefined)
+      formData.append('resourceTypeId', data.resourceTypeId)
     if (data.title !== undefined) formData.append('title', data.title)
-    if (data.description !== undefined) formData.append('description', data.description)
+    if (data.description !== undefined)
+      formData.append('description', data.description)
 
     // Append new files
     if (data.files?.length) {
@@ -153,7 +157,9 @@ export const updateContribution = async (
 
     // Append files to delete
     if (data.filesToDelete?.length) {
-      data.filesToDelete.forEach((fileId) => formData.append('filesToDelete', fileId.toString()))
+      data.filesToDelete.forEach((fileId) =>
+        formData.append('filesToDelete', fileId.toString())
+      )
     }
 
     const response = await api.patch(`/contributions/${id}`, formData, {

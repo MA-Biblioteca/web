@@ -40,27 +40,16 @@ import StarRating from '@/components/StarRating'
 import { bigIconSx } from '@/styles/global'
 import { useAuth } from '@/contexts/AuthContext'
 
-interface DecodedToken {
-  id: number
-  email: string
-  firstName?: string | null
-  lastName?: string | null
-  verified?: string
-  role: string
-  sub: string
-}
-
 const ContributionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { token } = useAuth()
+  const { userData } = useAuth()
   const [contribution, setContribution] = useState<Contribution | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [commentText, setCommentText] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
   const [downloading, setDownloading] = useState(false)
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null)
 
   const [avgRating, setAvgRating] = useState<number>(0)
   const [totalRatings, setTotalRatings] = useState<number>(0)
@@ -77,28 +66,6 @@ const ContributionDetail: React.FC = () => {
     message: '',
     severity: 'success',
   })
-
-  // Función para decodificar el token (igual que en Profile)
-  const decodeToken = (token: string): DecodedToken | null => {
-    try {
-      const payload = token.split('.')[1]
-      const decoded = JSON.parse(atob(payload))
-      return decoded
-    } catch (error) {
-      console.error('Error decoding token:', error)
-      return null
-    }
-  }
-
-  // Obtener el ID del usuario actual desde el token
-  useEffect(() => {
-    if (token) {
-      const decodedToken = decodeToken(token)
-      if (decodedToken) {
-        setCurrentUserId(decodedToken.id)
-      }
-    }
-  }, [token])
 
   useEffect(() => {
     const fetchContribution = async () => {
@@ -121,9 +88,8 @@ const ContributionDetail: React.FC = () => {
   }, [id])
 
   const getRatings = async () => {
-    if (!contribution) return
     const { avgRating, ratingsCount } = await getRatingsByContribution(
-      Number(contribution?.id)
+      Number(id)
     )
     setAvgRating(avgRating ?? 0)
     setTotalRatings(ratingsCount ?? 0)
@@ -131,8 +97,8 @@ const ContributionDetail: React.FC = () => {
 
   // Función para verificar si el usuario actual es el dueño de la contribución
   const isOwner = () => {
-    if (!currentUserId || !contribution) return false
-    return currentUserId === contribution.userId
+    if (!userData.id || !contribution) return false
+    return userData.id === contribution.userId
   }
 
   const handleRatingChange = async (newValue: number) => {
@@ -168,7 +134,18 @@ const ContributionDetail: React.FC = () => {
       const newComment = await addComment(contribution.id, commentText)
       setContribution({
         ...contribution,
-        comments: [...(contribution.comments || []), newComment],
+        comments: [
+          ...(contribution.comments || []),
+          {
+            ...newComment,
+            user: {
+              id: userData.id,
+              email: userData.email,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+            },
+          },
+        ],
       })
       setSnackbar({
         open: true,
@@ -316,13 +293,10 @@ const ContributionDetail: React.FC = () => {
         {/* Header */}
         <Box sx={{ mb: 3 }}>
           <Stack direction="row" spacing={2} alignItems="center">
-            <Button
-              startIcon={<ArrowBackIcon />}
-              onClick={() => navigate('/')}
-            >
+            <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')}>
               Volver
             </Button>
-            
+
             {/* BOTÓN DE EDITAR - SOLO PARA EL PROPIETARIO */}
             {isOwner() && (
               <Button
@@ -335,7 +309,7 @@ const ContributionDetail: React.FC = () => {
                   '&:hover': {
                     backgroundColor: 'primary.main',
                     color: 'white',
-                  }
+                  },
                 }}
               >
                 Editar
@@ -456,8 +430,7 @@ const ContributionDetail: React.FC = () => {
 
           {/* Description */}
           <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}
-            >
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
               Descripción
             </Typography>
             <Typography
